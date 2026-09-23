@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HandPicked Orders</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--ink:#1a2233;--mute:#6b7690;--line:#e3e8f0;--brand:#1C4585;
+--Voided:#FCE4E4;--Refunded:#FCE4E4;--Return:#FDEBD8;--Delivered:#E6F4EA;--InProgress:#FFF9C4;--Paid:#E8F0FE;--Pending:#fff}
+@media(prefers-color-scheme:dark){:root{--bg:#10141c;--card:#181e2a;--ink:#e8ecf4;--mute:#8d98b0;--line:#2a3345;
+--Voided:#4a2226;--Refunded:#4a2226;--Return:#4a3520;--Delivered:#1f3a2a;--InProgress:#40391a;--Paid:#1f2f4f;--Pending:#181e2a}}
+*{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--brand);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+header h1{margin:0;font-size:18px}main{padding:16px 20px;max-width:1400px;margin:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi small{color:var(--mute)}.kpi b{display:block;font-size:20px;margin-top:4px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+input,select,button,textarea{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+button{cursor:pointer}button.p{background:var(--brand);color:#fff;border-color:var(--brand)}
+.tabs button.on{background:var(--brand);color:#fff}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:1000px}
+th{background:var(--brand);color:#fff;padding:8px;text-align:left;white-space:nowrap;position:sticky;top:0}
+td{padding:7px 8px;border-top:1px solid var(--line)}tr.row{cursor:pointer}tr.row:hover td{filter:brightness(.96)}
+.b{padding:2px 8px;border-radius:99px;font-size:12px;border:1px solid var(--line)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(560px,94vw);padding:18px}
+dialog::backdrop{background:#0006}label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
+dialog input,dialog select,dialog textarea{width:100%}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.act{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+#toast{position:fixed;bottom:16px;right:16px;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;opacity:0;transition:.3s}
+#toast.s{opacity:1}
+</style>
+</head>
+<body>
+<header><h1>HandPicked.pk · Order Manager</h1>
+<div><button id="sync">↻ Sync statuses</button> <button id="csv">⬇ CSV</button> <button class="p" id="add">+ New order</button></div></header>
+<main>
+<div class="kpis" id="kpis"></div>
+<div class="bar tabs" id="tabs"></div>
+<div class="bar">
+<input id="q" placeholder="Search order, name, phone, tracking…" style="flex:1;min-width:200px">
+<select id="fs"></select><select id="fc"><option value="">COD + Online</option><option>COD</option><option>ONLINE</option></select>
+</div>
+<div class="wrap"><table><thead><tr id="th"></tr></thead><tbody id="tb"></tbody></table></div>
+</main>
+
+<dialog id="dlg"><form method="dialog" id="f"></form></dialog>
+<div id="toast"></div>
+
+<script>
+// ---------- config (mirrors the Apps Script) ----------
+const HEADERS=["Order No","Date","Description","Qty","C/B","Amount (PKR)","Status","Customer","Contact","Tracking ID","Courier","Daak Status","Denimish","Comments"];
+const KEYS=["no","date","desc","qty","cb","amount","status","cust","phone","track","courier","daak","denim","comments"];
+const STATUSES=["Pending","Paid","In Progress","Delivered","Voided","Refunded","RETURN"];
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const cls=s=>s==="RETURN"?"Return":s.replace(" ","");
+
+// Same logic as deriveStatus() in the script
+function deriveStatus(fin="",ful=""){fin=(fin||"").toLowerCase();ful=(ful||"").toLowerCase();
+ if(fin==="voided")return"Voided";if(fin==="refunded")return"Refunded";
+ if(ful==="fulfilled")return"Delivered";if(ful==="in_progress"||ful==="partial")return"In Progress";
+ if(fin==="paid")return"Paid";return"Pending";}
+
+// ---------- data layer (swap these for fetch() calls to your Apps Script later) ----------
+const API={
+ load(){try{const s=localStorage.getItem("hp_orders");if(s)return JSON.parse(s)}catch(e){}return seed()},
+ save(o){try{localStorage.setItem("hp_orders",JSON.stringify(o))}catch(e){}}
+};
+function seed(){
+ const prods=["HUGO BOSS POLO (NAVY / L)","LEVI'S 501 DENIM (32)","ZARA OVERSHIRT (OLIVE / M)","NIKE TECH FLEECE (BLACK / XL)","CK BOXER PACK","TOMMY HILFIGER CAP","H&M CHINOS (BEIGE / 34)"];
+ const names=["Ali Raza","Sara Khan","Usman Tariq","Ayesha Malik","Bilal Ahmed","Hina Shah","Hamza Iqbal","Noor Fatima","Zain Ali","Maryam Aslam"];
+ const fins=[["pending",null],["paid",null],["paid","fulfilled"],["pending","fulfilled"],["pending","in_progress"],["voided",null],["refunded",null],["paid","fulfilled"]];
+ const out=[];let n=1300;const now=new Date();
+ for(let i=0;i<48;i++){
+  const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i*1.6);
+  const [fi,fu]=fins[(i*3+i%5)%fins.length];const st=deriveStatus(fi,fu);
+  const qty=1+i%3;
+  out.push({no:"#"+(n+47-i),date:d.toISOString().slice(0,10),desc:prods[i%prods.length],qty,
+   cb:fi==="paid"?"ONLINE":"COD",amount:(2500+((i*937)%4500)),status:i%13===4?"RETURN":st,
+   cust:names[i%names.length],phone:"03"+(0+(i%5))+String(1000000+i*73211).slice(0,7),
+   track:st==="Delivered"?"DK"+(700000+i*37):"",courier:"Daak",daak:st==="Delivered"?"Delivered":"",denim:"",comments:""});
+ }
+ return out;
+}
+let orders=API.load(),month="All";
+
+// ---------- helpers ----------
+const $=id=>document.getElementById(id);
+const fmtDate=iso=>{const d=new Date(iso);return String(d.getDate()).padStart(2,"0")+"-"+MONTHS[d.getMonth()]+"-"+String(d.getFullYear()).slice(-2)};
+const tab=iso=>{const d=new Date(iso);return MONTHS[d.getMonth()]+"-"+String(d.getFullYear()).slice(-2)};
+const pkr=n=>"Rs "+Math.round(n).toLocaleString();
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const toast=m=>{$("toast").textContent=m;$("toast").classList.add("s");setTimeout(()=>$("toast").classList.remove("s"),1800)};
+const commit=()=>{API.save(orders);render()};
+
+// ---------- render ----------
+$("th").innerHTML=HEADERS.map(h=>`<th>${h}</th>`).join("");
+$("fs").innerHTML='<option value="">All statuses</option>'+STATUSES.map(s=>`<option>${s}</option>`).join("");
+function render(){
+ const months=[...new Set(orders.map(o=>tab(o.date)))];
+ $("tabs").innerHTML=["All",...months].map(m=>`<button class="${m===month?"on":""}" data-m="${m}">${m}</button>`).join("");
+ const q=$("q").value.toLowerCase(),fs=$("fs").value,fc=$("fc").value;
+ const rows=orders.filter(o=>(month==="All"||tab(o.date)===month)&&(!fs||o.status===fs)&&(!fc||o.cb===fc)&&
+  (!q||[o.no,o.cust,o.phone,o.track,o.desc].join(" ").toLowerCase().includes(q)))
+  .sort((a,b)=>b.date.localeCompare(a.date)||b.no.localeCompare(a.no));
+ const live=rows.filter(o=>!["Voided","Refunded","RETURN"].includes(o.status));
+ const sum=a=>a.reduce((s,o)=>s+o.amount,0);
+ const cod=rows.filter(o=>o.cb==="COD"&&!["Delivered","Voided","Refunded","RETURN"].includes(o.status));
+ const ret=rows.filter(o=>o.status==="RETURN");
+ $("kpis").innerHTML=[
+  ["Orders",rows.length],["Revenue (excl. void/return)",pkr(sum(live))],
+  ["Delivered",rows.filter(o=>o.status==="Delivered").length],
+  ["COD pending collection",pkr(sum(cod))+" · "+cod.length],
+  ["Returns",ret.length+" ("+(rows.length?Math.round(ret.length/rows.length*100):0)+"%)"],
+  ["Online paid",pkr(sum(rows.filter(o=>o.cb==="ONLINE")))]
+ ].map(([a,b])=>`<div class="kpi"><small>${a}</small><b>${b}</b></div>`).join("");
+ $("tb").innerHTML=rows.map(o=>`<tr class="row" data-no="${esc(o.no)}" style="background:var(--${cls(o.status)})">`+
+  KEYS.map(k=>{let v=o[k];if(k==="date")v=fmtDate(v);else if(k==="amount")v=Number(v).toLocaleString();
+   else if(k==="status")return`<td><span class="b">${esc(v)}</span></td>`;return`<td>${esc(v)}</td>`}).join("")+`</tr>`).join("")
+  ||`<tr><td colspan="14" style="text-align:center;padding:30px;color:var(--mute)">No orders match.</td></tr>`;
+}
+$("tabs").onclick=e=>{if(e.target.dataset.m){month=e.target.dataset.m;render()}};
+["q","fs","fc"].forEach(id=>$(id).oninput=render);
+$("tb").onclick=e=>{const tr=e.target.closest("tr.row");if(tr)openForm(orders.find(o=>o.no===tr.dataset.no))};
+
+// ---------- edit / add dialog ----------
+function openForm(o){
+ const isNew=!o;o=o||{no:"#"+(Math.max(...orders.map(x=>+x.no.slice(1)||0),1300)+1),date:new Date().toISOString().slice(0,10),desc:"",qty:1,cb:"COD",amount:0,status:"Pending",cust:"",phone:"",track:"",courier:"Daak",daak:"",denim:"",comments:""};
+ const inp=(k,l,t="text")=>`<div><label>${l}</label><input name="${k}" type="${t}" value="${esc(o[k])}"></div>`;
+ $("f").innerHTML=`<h3 style="margin:0">${isNew?"New order":"Order "+esc(o.no)}</h3>
+ <div class="two">${inp("no","Order No")}${inp("date","Date","date")}</div>
+ ${inp("desc","Description")}
+ <div class="two">${inp("qty","Qty","number")}${inp("amount","Amount (PKR)","number")}</div>
+ <div class="two"><div><label>C/B</label><select name="cb"><option ${o.cb==="COD"?"selected":""}>COD</option><option ${o.cb==="ONLINE"?"selected":""}>ONLINE</option></select></div>
+ <div><label>Status</label><select name="status">${STATUSES.map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></div></div>
+ <div class="two">${inp("cust","Customer")}${inp("phone","Contact")}</div>
+ <div class="two">${inp("track","Tracking ID")}${inp("courier","Courier")}</div>
+ <div class="two">${inp("daak","Daak Status")}${inp("denim","Denimish")}</div>
+ <label>Comments</label><textarea name="comments" rows="2">${esc(o.comments)}</textarea>
+ <div class="act">${isNew?"":'<button type="button" id="del">Delete</button><button type="button" id="ret">Mark RETURN</button>'}
+ <button type="button" id="x">Cancel</button><button class="p" value="ok">Save</button></div>`;
+ $("dlg").showModal();
+ $("x").onclick=()=>$("dlg").close();
+ if(!isNew){
+  $("ret").onclick=()=>{o.status="RETURN";$("dlg").close();commit();toast("Marked RETURN")};
+  $("del").onclick=()=>{if(confirm("Delete "+o.no+"?")){orders=orders.filter(x=>x!==o);$("dlg").close();commit()}};
+ }
+ $("f").onsubmit=ev=>{
+  if(ev.submitter?.value!=="ok")return;
+  const d=Object.fromEntries(new FormData($("f")));
+  d.qty=+d.qty;d.amount=+d.amount;
+  if(d.phone.startsWith("+92"))d.phone="0"+d.phone.slice(3);d.phone=d.phone.replace(/\s+/g,"");
+  if(isNew){if(orders.some(x=>x.no===d.no)){ev.preventDefault();return toast("Order no. exists")}orders.push(d)}else Object.assign(o,d);
+  commit();toast("Saved");
+ };
+}
+$("add").onclick=()=>openForm();
+
+// ---------- toolbar ----------
+// Stand-in for syncAllStatuses(): here it just re-derives nothing; wire to Shopify via your Apps Script web app.
+$("sync").onclick=()=>toast("Demo mode – connect to Apps Script to sync");
+$("csv").onclick=()=>{
+ const csv=[HEADERS,...orders.map(o=>KEYS.map(k=>o[k]))].map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="handpicked-orders.csv";a.click();
+};
+render();
+</script>
+</body>
+</html>
