@@ -3,168 +3,606 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HandPicked Orders</title>
+<title>ShopDesk</title>
 <style>
-:root{--bg:#f4f6fa;--card:#fff;--ink:#1a2233;--mute:#6b7690;--line:#e3e8f0;--brand:#1C4585;
+:root{--bg:#f4f6fa;--card:#fff;--ink:#1a2233;--mute:#6b7690;--line:#e3e8f0;--brand:#1C4585;--good:#1e8e3e;--bad:#c5221f;--warn:#b06000;
 --Voided:#FCE4E4;--Refunded:#FCE4E4;--Return:#FDEBD8;--Delivered:#E6F4EA;--InProgress:#FFF9C4;--Paid:#E8F0FE;--Pending:#fff}
-@media(prefers-color-scheme:dark){:root{--bg:#10141c;--card:#181e2a;--ink:#e8ecf4;--mute:#8d98b0;--line:#2a3345;
+@media(prefers-color-scheme:dark){:root{--bg:#10141c;--card:#181e2a;--ink:#e8ecf4;--mute:#8d98b0;--line:#2a3345;--brand:#4b7fd1;--good:#6fcf8a;--bad:#f28b82;--warn:#fbbc5a;
 --Voided:#4a2226;--Refunded:#4a2226;--Return:#4a3520;--Delivered:#1f3a2a;--InProgress:#40391a;--Paid:#1f2f4f;--Pending:#181e2a}}
 *{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-header{background:var(--brand);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-header h1{margin:0;font-size:18px}main{padding:16px 20px;max-width:1400px;margin:auto}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
-.kpi small{color:var(--mute)}.kpi b{display:block;font-size:20px;margin-top:4px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+nav{background:var(--card);border-right:1px solid var(--line);padding:14px 10px;position:sticky;top:0;height:100vh;overflow:auto}
+nav h1{font-size:16px;margin:0 6px 4px;color:var(--brand)}nav .sub{margin:0 6px 12px;font-size:11px;color:var(--mute)}
+nav h6{margin:12px 8px 4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+nav a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:var(--ink);text-decoration:none;margin-bottom:1px}
+nav a:hover{background:var(--bg)}nav a.on{background:var(--brand);color:#fff}
+nav a i{font-style:normal;width:20px;text-align:center}
+nav .cnt{margin-left:auto;font-size:11px;background:var(--bad);color:#fff;border-radius:99px;padding:1px 7px}
+main{padding:16px 22px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.top h2{margin:0;font-size:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.card small{color:var(--mute)}.card b{display:block;font-size:20px;margin-top:4px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:16px}
+.card h3,main h3{margin:0 0 10px;font-size:14px}main>#view>h3{margin-top:18px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
 input,select,button,textarea{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
-button{cursor:pointer}button.p{background:var(--brand);color:#fff;border-color:var(--brand)}
+button{cursor:pointer}button:hover{filter:brightness(.95)}button.p{background:var(--brand);color:#fff;border-color:var(--brand)}
+button.d{color:var(--bad)}button.s{padding:3px 8px;font-size:12px}
 .tabs button.on{background:var(--brand);color:#fff}
-.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;min-width:1000px}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
+.scroll{max-height:320px;overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:600px}
 th{background:var(--brand);color:#fff;padding:8px;text-align:left;white-space:nowrap;position:sticky;top:0}
-td{padding:7px 8px;border-top:1px solid var(--line)}tr.row{cursor:pointer}tr.row:hover td{filter:brightness(.96)}
-.b{padding:2px 8px;border-radius:99px;font-size:12px;border:1px solid var(--line)}
-dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(560px,94vw);padding:18px}
+td{padding:7px 8px;border-top:1px solid var(--line);vertical-align:middle}
+tr.row{cursor:pointer}tr.row:hover td{filter:brightness(.96)}
+td input,td select{padding:4px 6px;width:100%;min-width:90px}
+td.ck,th.ck{width:30px;text-align:center}td.ck input,th.ck input{width:auto;min-width:0}
+td.r,th.r{text-align:right}
+.b{padding:2px 8px;border-radius:99px;font-size:12px;border:1px solid var(--line);white-space:nowrap}
+.tag{padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.t-vip,.t-ok{background:#e6f4ea;color:#1e8e3e}.t-risk,.t-bad{background:#fce4e4;color:#c5221f}.t-blk{background:#222;color:#fff}.t-new{background:#e8f0fe;color:#1c4585}.t-warn{background:#fff3cd;color:#8a5a00}
+.bulk{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--brand);border-radius:10px;padding:8px 10px;margin-bottom:12px}
+.hbar{display:flex;align-items:center;gap:8px;margin:6px 0}.hbar span:first-child{width:110px;color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar .o{height:10px;background:var(--brand);border-radius:5px;min-width:2px}.hbar em{font-style:normal;font-size:12px}
+.cols{display:flex;align-items:flex-end;gap:8px;height:150px}.cols div{flex:1;text-align:center;font-size:11px;color:var(--mute)}
+.cols i{display:block;background:var(--brand);border-radius:4px 4px 0 0;margin-bottom:4px}
+.alert{padding:8px 10px;border-radius:8px;background:var(--InProgress);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.muted{color:var(--mute)}.empty{padding:22px;text-align:center;color:var(--mute)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(620px,94vw);padding:18px;max-height:92vh}
 dialog::backdrop{background:#0006}label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
-dialog input,dialog select,dialog textarea{width:100%}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+dialog input,dialog select,dialog textarea,.form input,.form textarea,.form select{width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.three{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:6px}
 .act{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
-#toast{position:fixed;bottom:16px;right:16px;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;opacity:0;transition:.3s}
+.form{max-width:780px}.chk{display:inline-flex;align-items:center;gap:5px;margin:3px 12px 3px 0;font-size:13px;color:var(--ink)}.chk input{width:auto}
+.big{font-size:22px;font-weight:700}
+#toast{position:fixed;bottom:16px;right:16px;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
 #toast.s{opacity:1}
+@media(max-width:800px){.app{grid-template-columns:1fr}nav{position:static;height:auto;display:flex;overflow-x:auto;gap:4px;padding:8px;align-items:center}
+nav h1,nav .sub,nav h6{display:none}nav a{white-space:nowrap}main{padding:12px}}
 </style>
 </head>
 <body>
-<header><h1>HandPicked.pk · Order Manager</h1>
-<div><button id="sync">↻ Sync statuses</button> <button id="csv">⬇ CSV</button> <button class="p" id="add">+ New order</button></div></header>
-<main>
-<div class="kpis" id="kpis"></div>
-<div class="bar tabs" id="tabs"></div>
-<div class="bar">
-<input id="q" placeholder="Search order, name, phone, tracking…" style="flex:1;min-width:200px">
-<select id="fs"></select><select id="fc"><option value="">COD + Online</option><option>COD</option><option>ONLINE</option></select>
+<div class="app">
+<nav id="nav"></nav>
+<main><div class="top"><h2 id="title"></h2><div><button id="sync">↻ Sync from Shopify</button> <button class="p" id="add">+ New order</button></div></div>
+<div id="view"></div></main>
 </div>
-<div class="wrap"><table><thead><tr id="th"></tr></thead><tbody id="tb"></tbody></table></div>
-</main>
-
 <dialog id="dlg"><form method="dialog" id="f"></form></dialog>
 <div id="toast"></div>
 
 <script>
-// ---------- config (mirrors the Apps Script) ----------
-const HEADERS=["Order No","Date","Description","Qty","C/B","Amount (PKR)","Status","Customer","Contact","Tracking ID","Courier","Daak Status","Denimish","Comments"];
+// ===================== CONFIG =====================
+const HEADERS=["Order No","Date","Description","Qty","C/B","Amount (PKR)","Status","Customer","Contact","Tracking ID","Courier","Courier Status","Custom","Comments"];
 const KEYS=["no","date","desc","qty","cb","amount","status","cust","phone","track","courier","daak","denim","comments"];
 const STATUSES=["Pending","Paid","In Progress","Delivered","Voided","Refunded","RETURN"];
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const REASONS=["Refused / not received","Wrong size","Damaged","Wrong item","Fake / unreachable","Other"];
+const PAYM=["Cash","Bank transfer","Cheque","Wallet"],POSM=["Cash","Card","Bank transfer","Wallet"];
+const NAV=[["Sell",[["pos","🏬","POS Sales"],["inventory","📚","Inventory"]]],
+ ["Online orders",[["dashboard","📊","Dashboard"],["orders","🧾","Orders"],["dispatch","📦","Dispatch"],["returns","↩️","Returns"],["customers","👥","Customers"],["whatsapp","💬","WhatsApp"]]],
+ ["Money",[["recon","🔁","COD Reconciliation"],["vendors","🏭","Vendors & Payables"],["finance","🧮","Finance"]]],
+ ["Insight",[["products","🏷️","Product report"],["reports","📈","Reports & Data"],["settings","⚙️","Settings"]]]];
 const cls=s=>s==="RETURN"?"Return":s.replace(" ","");
+const DEF={shop:"My Store",couriers:["TCS","Leopards","M&P","PostEx","Trax"],courierFee:250,feeDeducted:true,returnFee:250,costPct:55,staleDays:3,blocked:[],cols:KEYS.slice(0,10),onlineLoc:"wh",
+ tpl:{confirm:"Hello {name}! Your order {order} ({desc}) of Rs {amount} is confirmed. Payment: {cb}. Thank you for shopping with {shop}.",
+ ship:"Hi {name}, your order {order} has been dispatched via {courier}. Tracking ID: {track}. Amount to pay: Rs {amount} ({cb}).",
+ follow:"Hi {name}, hope you liked your order {order}! Please share your feedback with {shop}."}};
 
-// Same logic as deriveStatus() in the script
-function deriveStatus(fin="",ful=""){fin=(fin||"").toLowerCase();ful=(ful||"").toLowerCase();
+// Same rules as deriveStatus() in the Apps Script
+function deriveStatus(fin,ful){fin=(fin||"").toLowerCase();ful=(ful||"").toLowerCase();
  if(fin==="voided")return"Voided";if(fin==="refunded")return"Refunded";
  if(ful==="fulfilled")return"Delivered";if(ful==="in_progress"||ful==="partial")return"In Progress";
  if(fin==="paid")return"Paid";return"Pending";}
 
-// ---------- data layer (swap these for fetch() calls to your Apps Script later) ----------
+// ===================== DATA LAYER =====================
+// Everything lives in DB. Swap API.load/save for fetch() calls to your backend / Apps Script later.
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const uid=()=>Math.random().toString(36).slice(2,9);
+const KEY="shopdesk_v1";
+const blank=()=>({orders:[],settings:structuredClone(DEF),stores:[],vendors:[],products:[],bills:[],vpay:[],posSales:[],moves:[],remits:[],dispatches:[]});
+const norm=d=>({...blank(),...d,settings:{...DEF,...d.settings,tpl:{...DEF.tpl,...(d.settings||{}).tpl}}});
 const API={
- load(){try{const s=localStorage.getItem("hp_orders");if(s)return JSON.parse(s)}catch(e){}return seed()},
- save(o){try{localStorage.setItem("hp_orders",JSON.stringify(o))}catch(e){}}
+ load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.orders)return norm(s)}catch(e){}return seed()},
+ save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
 };
 function seed(){
- const prods=["HUGO BOSS POLO (NAVY / L)","LEVI'S 501 DENIM (32)","ZARA OVERSHIRT (OLIVE / M)","NIKE TECH FLEECE (BLACK / XL)","CK BOXER PACK","TOMMY HILFIGER CAP","H&M CHINOS (BEIGE / 34)"];
- const names=["Ali Raza","Sara Khan","Usman Tariq","Ayesha Malik","Bilal Ahmed","Hina Shah","Hamza Iqbal","Noor Fatima","Zain Ali","Maryam Aslam"];
- const fins=[["pending",null],["paid",null],["paid","fulfilled"],["pending","fulfilled"],["pending","in_progress"],["voided",null],["refunded",null],["paid","fulfilled"]];
- const out=[];let n=1300;const now=new Date();
- for(let i=0;i<48;i++){
-  const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i*1.6);
-  const [fi,fu]=fins[(i*3+i%5)%fins.length];const st=deriveStatus(fi,fu);
-  const qty=1+i%3;
-  out.push({no:"#"+(n+47-i),date:d.toISOString().slice(0,10),desc:prods[i%prods.length],qty,
-   cb:fi==="paid"?"ONLINE":"COD",amount:(2500+((i*937)%4500)),status:i%13===4?"RETURN":st,
-   cust:names[i%names.length],phone:"03"+(0+(i%5))+String(1000000+i*73211).slice(0,7),
-   track:st==="Delivered"?"DK"+(700000+i*37):"",courier:"Daak",daak:st==="Delivered"?"Delivered":"",denim:"",comments:""});
+ let r=7;const rnd=()=>(r=(r*9301+49297)%233280)/233280;const now=new Date();const day=n=>iso(new Date(now.getFullYear(),now.getMonth(),now.getDate()-n));
+ const d=blank();
+ d.stores=[{id:"wh",name:"Online / Warehouse"},{id:"s1",name:"Main Store"},{id:"s2",name:"Mall Outlet"}];
+ d.vendors=[{id:"v1",name:"Karachi Garments Co.",phone:"03001112233",terms:30},{id:"v2",name:"Lahore Denim House",phone:"03214445566",terms:15},{id:"v3",name:"Imported Accessories Ltd",phone:"03337778899",terms:30}];
+ [["HUGO BOSS POLO",2800,4900,"v1"],["LEVI'S 501 DENIM",3200,5800,"v2"],["ZARA OVERSHIRT",2400,4200,"v1"],["NIKE TECH FLEECE",4300,7500,"v1"],
+  ["CK BOXER PACK",1200,2400,"v3"],["TOMMY HILFIGER CAP",900,1800,"v3"],["H&M CHINOS",2000,3800,"v2"],["LEATHER BELT",700,1600,"v3"]].forEach((p,i)=>
+  d.products.push({id:"p"+i,sku:"SKU"+(100+i),name:p[0],cost:p[1],price:p[2],vendor:p[3],reorder:10,
+   stock:i===5?{wh:3,s1:2,s2:1}:{wh:20+(i*7)%25,s1:4+(i*2)%9,s2:3+i%6}}));
+ const names=["Ali Raza","Sara Khan","Usman Tariq","Ayesha Malik","Bilal Ahmed","Hina Shah","Hamza Iqbal","Noor Fatima","Zain Ali","Maryam Aslam","Fahad Butt"];
+ const fins=[["pending",null],["paid",null],["paid","fulfilled"],["pending","fulfilled"],["pending","in_progress"],["voided",null],["refunded",null],["pending","fulfilled"],["pending","fulfilled"]];
+ const cour=["TCS","Leopards","PostEx","Trax"],sizes=["S","M","L","XL"];
+ for(let i=0;i<70;i++){
+  const p=d.products[(i*5)%7],[fi,fu]=fins[(i*3+i%5)%fins.length];let st=deriveStatus(fi,fu);
+  const cb=fi==="paid"?"ONLINE":"COD";if(i%11===4&&st==="Delivered")st="RETURN";const shipped=["Delivered","In Progress","RETURN"].includes(st),qty=1+i%3;
+  d.orders.push({no:"#"+(1400-i),date:day(Math.floor(i*1.7)),desc:p.name+" ("+sizes[i%4]+")",qty,cb,amount:p.price*qty,status:st,cust:names[i%names.length],
+   phone:"03"+(i%5)+"1"+String(2000000+(i%names.length)*31337).slice(0,7),track:shipped?"TRK"+(700000+i*37):"",courier:shipped?cour[i%cour.length]:"",
+   daak:st==="Delivered"?"Delivered":"",denim:"",comments:"",settled:cb==="ONLINE"||(st==="Delivered"&&i>18),reason:st==="RETURN"?REASONS[i%REASONS.length]:"",stocked:shipped,restocked:st==="RETURN"});
  }
- return out;
+ d.orders.filter(o=>o.track).forEach(o=>d.dispatches.push({id:uid(),ts:new Date(o.date+"T10:00").getTime(),date:o.date,no:o.no,cust:o.cust,phone:o.phone,courier:o.courier,track:o.track,cod:o.cb==="COD"?o.amount:0}));
+ const g={};d.orders.filter(o=>o.cb==="COD"&&o.settled&&o.status==="Delivered").forEach(o=>(g[o.courier]=g[o.courier]||[]).push(o));
+ Object.entries(g).forEach(([c,os],i)=>{const ex=os.reduce((s,o)=>s+o.amount-DEF.courierFee,0),id=uid();os.forEach(o=>o.remitId=id);
+  d.remits.push({id,date:day(2+i),courier:c,ref:"RMT-"+(200+i),expected:ex,received:i===1?ex-500:ex,orders:os.map(o=>o.no)})});
+ [[40,"v1",[[0,30,2800],[2,20,2400]],"wh",1],[32,"v2",[[1,25,3200],[6,20,2000]],"wh",1],[24,"v3",[[4,40,1200],[5,30,900],[7,20,700]],"wh",1],[12,"v1",[[3,15,4300]],"s1",1],[5,"v2",[[1,10,3200]],"s2",1]].forEach(([ago,v,ls,loc],i)=>{
+  const items=ls.map(([pi,q,c])=>({pid:"p"+pi,qty:q,cost:c}));d.bills.push({id:"b"+i,date:day(ago),vendor:v,ref:"INV-"+(500+i),items,total:items.reduce((s,x)=>s+x.qty*x.cost,0),loc})});
+ [[35,"v1",60000],[20,"v2",50000],[10,"v3",40000]].forEach(([ago,v,a],i)=>d.vpay.push({id:"vp"+i,date:day(ago),vendor:v,amount:a,method:"Bank transfer",ref:"TRF-"+(900+i),note:""}));
+ for(let k=0;k<46;k++){const st=k%2?"s1":"s2",n=1+Math.floor(rnd()*2),items=[];
+  for(let j=0;j<n;j++){const p=d.products[Math.floor(rnd()*8)],q=1+Math.floor(rnd()*2);items.push({pid:p.id,name:p.name,qty:q,price:p.price,cost:p.cost})}
+  const sub=items.reduce((s,x)=>s+x.qty*x.price,0),disc=k%7===0?200:0;
+  d.posSales.push({id:uid(),no:"POS-"+(1000+k),date:day(Math.floor(k/3)),time:pad(10+k%9)+":"+pad((k*7)%60),store:st,items,discount:disc,total:sub-disc,method:POSM[k%3],void:false})}
+ return d;
 }
-let orders=API.load(),month="All";
+let DB=API.load(),SET=DB.settings;const commit=()=>API.save();
+const sel=new Set();let CUR="dashboard";
 
-// ---------- helpers ----------
-const $=id=>document.getElementById(id);
-const fmtDate=iso=>{const d=new Date(iso);return String(d.getDate()).padStart(2,"0")+"-"+MONTHS[d.getMonth()]+"-"+String(d.getFullYear()).slice(-2)};
-const tab=iso=>{const d=new Date(iso);return MONTHS[d.getMonth()]+"-"+String(d.getFullYear()).slice(-2)};
-const pkr=n=>"Rs "+Math.round(n).toLocaleString();
+// ===================== HELPERS =====================
+const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const toast=m=>{$("toast").textContent=m;$("toast").classList.add("s");setTimeout(()=>$("toast").classList.remove("s"),1800)};
-const commit=()=>{API.save(orders);render()};
+const sum=a=>a.reduce((s,o)=>s+Number(o.amount||0),0);
+const pkr=n=>"Rs "+Math.round(n).toLocaleString();
+const num=n=>Number(n||0).toLocaleString();
+const fmtDate=s=>{if(!s)return"";const d=new Date(s+"T00:00");return pad(d.getDate())+"-"+MONTHS[d.getMonth()]+"-"+String(d.getFullYear()).slice(-2)};
+const monthOf=s=>{const d=new Date(s+"T00:00");return MONTHS[d.getMonth()]+"-"+String(d.getFullYear()).slice(-2)};
+const age=s=>Math.floor((Date.now()-new Date(s+"T00:00"))/864e5);
+const today=()=>iso(new Date()),monthStart=()=>iso(new Date(new Date().getFullYear(),new Date().getMonth(),1));
+const toast=m=>{const t=$("#toast");t.textContent=m;t.classList.add("s");setTimeout(()=>t.classList.remove("s"),2200)};
+const isShipped=o=>["Delivered","In Progress","RETURN"].includes(o.status);
+const dead=o=>["Voided","Refunded","RETURN"].includes(o.status);
+const live=()=>DB.orders.filter(o=>!dead(o));
+const codDue=o=>o.cb==="COD"&&o.status==="Delivered"&&!o.settled;
+const inTransit=o=>o.cb==="COD"&&o.status==="In Progress";
+const ready=o=>(o.status==="Pending"||o.status==="Paid")&&!o.track;
+const badge=s=>`<span class="b" style="background:var(--${cls(s)})">${esc(s)}</span>`;
+const tag=(t,c)=>`<span class="tag t-${c}">${esc(t)}</span>`;
+const opts=(a,v)=>a.map(x=>`<option ${x===v?"selected":""}>${esc(x)}</option>`).join("");
+const kv=(a,v,ph)=>(ph?`<option value="">${ph}</option>`:"")+a.map(([k,l])=>`<option value="${esc(k)}" ${k===v?"selected":""}>${esc(l)}</option>`).join("");
+const byNo=no=>DB.orders.find(o=>o.no===no),pById=id=>DB.products.find(p=>p.id===id),vById=id=>DB.vendors.find(v=>v.id===id);
+const storeName=id=>(DB.stores.find(s=>s.id===id)||{name:id||"—"}).name;
+const storeKV=()=>DB.stores.map(s=>[s.id,s.name]),prodKV=()=>DB.products.map(p=>[p.id,p.name+" ("+p.sku+")"]),vendKV=()=>DB.vendors.map(v=>[v.id,v.name]);
+const stockOf=(p,l)=>p.stock[l]||0,totalStock=p=>Object.values(p.stock).reduce((a,b)=>a+b,0);
+const normPhone=p=>{p=String(p||"").replace(/\D/g,"");return p.startsWith("0")?"92"+p.slice(1):p};
+const T=(h,rows,right=[])=>rows.length?`<div class="wrap"><table><thead><tr>${h.map((x,i)=>`<th class="${right.includes(i)?"r":""}">${x}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`:'<div class="wrap"><div class="empty">Nothing here yet.</div></div>';
+function download(name,rows){const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download=name;a.click()}
+const ordersToRows=os=>[HEADERS.concat("Settled","Return reason"),...os.map(o=>KEYS.map(k=>o[k]).concat(o.settled?"Yes":"No",o.reason||""))];
+function printDoc(title,html){const w=window.open("","_blank");if(!w)return toast("Allow pop-ups to print");
+ w.document.write(`<title>${esc(title)}</title><style>body{font:13px Arial;margin:20px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:5px;text-align:left}.slip{border:2px dashed #555;padding:10px;margin:10px 0;page-break-inside:avoid}.r{text-align:right}</style><h2>${esc(title)}</h2>${html}`);
+ w.document.close();w.focus();setTimeout(()=>w.print(),300)}
+function fillTpl(t,o){return SET.tpl[t].replace(/\{(\w+)\}/g,(_,k)=>({name:o.cust,order:o.no,desc:o.desc,amount:num(o.amount),cb:o.cb,courier:o.courier||"courier",track:o.track||"(pending)",shop:SET.shop})[k]??"")}
+function hbars(items,fmt=v=>v){const m=Math.max(1,...items.map(i=>i[1]));return items.map(([l,v])=>`<div class="hbar"><span title="${esc(l)}">${esc(l)}</span><div class="o" style="width:${Math.max(0,v)/m*55}%"></div><em>${fmt(v)}</em></div>`).join("")||'<div class="empty">No data</div>'}
 
-// ---------- render ----------
-$("th").innerHTML=HEADERS.map(h=>`<th>${h}</th>`).join("");
-$("fs").innerHTML='<option value="">All statuses</option>'+STATUSES.map(s=>`<option>${s}</option>`).join("");
-function render(){
- const months=[...new Set(orders.map(o=>tab(o.date)))];
- $("tabs").innerHTML=["All",...months].map(m=>`<button class="${m===month?"on":""}" data-m="${m}">${m}</button>`).join("");
- const q=$("q").value.toLowerCase(),fs=$("fs").value,fc=$("fc").value;
- const rows=orders.filter(o=>(month==="All"||tab(o.date)===month)&&(!fs||o.status===fs)&&(!fc||o.cb===fc)&&
-  (!q||[o.no,o.cust,o.phone,o.track,o.desc].join(" ").toLowerCase().includes(q)))
-  .sort((a,b)=>b.date.localeCompare(a.date)||b.no.localeCompare(a.no));
- const live=rows.filter(o=>!["Voided","Refunded","RETURN"].includes(o.status));
- const sum=a=>a.reduce((s,o)=>s+o.amount,0);
- const cod=rows.filter(o=>o.cb==="COD"&&!["Delivered","Voided","Refunded","RETURN"].includes(o.status));
- const ret=rows.filter(o=>o.status==="RETURN");
- $("kpis").innerHTML=[
-  ["Orders",rows.length],["Revenue (excl. void/return)",pkr(sum(live))],
-  ["Delivered",rows.filter(o=>o.status==="Delivered").length],
-  ["COD pending collection",pkr(sum(cod))+" · "+cod.length],
-  ["Returns",ret.length+" ("+(rows.length?Math.round(ret.length/rows.length*100):0)+"%)"],
-  ["Online paid",pkr(sum(rows.filter(o=>o.cb==="ONLINE")))]
- ].map(([a,b])=>`<div class="kpi"><small>${a}</small><b>${b}</b></div>`).join("");
- $("tb").innerHTML=rows.map(o=>`<tr class="row" data-no="${esc(o.no)}" style="background:var(--${cls(o.status)})">`+
-  KEYS.map(k=>{let v=o[k];if(k==="date")v=fmtDate(v);else if(k==="amount")v=Number(v).toLocaleString();
-   else if(k==="status")return`<td><span class="b">${esc(v)}</span></td>`;return`<td>${esc(v)}</td>`}).join("")+`</tr>`).join("")
-  ||`<tr><td colspan="14" style="text-align:center;padding:30px;color:var(--mute)">No orders match.</td></tr>`;
-}
-$("tabs").onclick=e=>{if(e.target.dataset.m){month=e.target.dataset.m;render()}};
-["q","fs","fc"].forEach(id=>$(id).oninput=render);
-$("tb").onclick=e=>{const tr=e.target.closest("tr.row");if(tr)openForm(orders.find(o=>o.no===tr.dataset.no))};
+// generic modal: html body, ok(FormData) returns false to keep open
+function modal(html,ok,{label="Save",extra=""}={}){
+ $("#f").innerHTML=html+`<div class="act">${extra}<button type="button" id="x">Cancel</button><button class="p" value="ok">${label}</button></div>`;
+ $("#dlg").showModal();$("#x").onclick=()=>$("#dlg").close();
+ $("#f").onsubmit=ev=>{if(ev.submitter?.value!=="ok")return;if(ok(new FormData($("#f")),ev)===false)ev.preventDefault()}}
+const fld=(n,l,v="",t="text",x="")=>`<div><label>${l}</label><input name="${n}" type="${t}" value="${esc(v)}" ${x}></div>`;
+const sfld=(n,l,html)=>`<div><label>${l}</label><select name="${n}">${html}</select></div>`;
 
-// ---------- edit / add dialog ----------
-function openForm(o){
- const isNew=!o;o=o||{no:"#"+(Math.max(...orders.map(x=>+x.no.slice(1)||0),1300)+1),date:new Date().toISOString().slice(0,10),desc:"",qty:1,cb:"COD",amount:0,status:"Pending",cust:"",phone:"",track:"",courier:"Daak",daak:"",denim:"",comments:""};
- const inp=(k,l,t="text")=>`<div><label>${l}</label><input name="${k}" type="${t}" value="${esc(o[k])}"></div>`;
- $("f").innerHTML=`<h3 style="margin:0">${isNew?"New order":"Order "+esc(o.no)}</h3>
- <div class="two">${inp("no","Order No")}${inp("date","Date","date")}</div>
- ${inp("desc","Description")}
- <div class="two">${inp("qty","Qty","number")}${inp("amount","Amount (PKR)","number")}</div>
- <div class="two"><div><label>C/B</label><select name="cb"><option ${o.cb==="COD"?"selected":""}>COD</option><option ${o.cb==="ONLINE"?"selected":""}>ONLINE</option></select></div>
- <div><label>Status</label><select name="status">${STATUSES.map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></div></div>
- <div class="two">${inp("cust","Customer")}${inp("phone","Contact")}</div>
- <div class="two">${inp("track","Tracking ID")}${inp("courier","Courier")}</div>
- <div class="two">${inp("daak","Daak Status")}${inp("denim","Denimish")}</div>
- <label>Comments</label><textarea name="comments" rows="2">${esc(o.comments)}</textarea>
- <div class="act">${isNew?"":'<button type="button" id="del">Delete</button><button type="button" id="ret">Mark RETURN</button>'}
- <button type="button" id="x">Cancel</button><button class="p" value="ok">Save</button></div>`;
- $("dlg").showModal();
- $("x").onclick=()=>$("dlg").close();
- if(!isNew){
-  $("ret").onclick=()=>{o.status="RETURN";$("dlg").close();commit();toast("Marked RETURN")};
-  $("del").onclick=()=>{if(confirm("Delete "+o.no+"?")){orders=orders.filter(x=>x!==o);$("dlg").close();commit()}};
- }
- $("f").onsubmit=ev=>{
-  if(ev.submitter?.value!=="ok")return;
-  const d=Object.fromEntries(new FormData($("f")));
-  d.qty=+d.qty;d.amount=+d.amount;
-  if(d.phone.startsWith("+92"))d.phone="0"+d.phone.slice(3);d.phone=d.phone.replace(/\s+/g,"");
-  if(isNew){if(orders.some(x=>x.no===d.no)){ev.preventDefault();return toast("Order no. exists")}orders.push(d)}else Object.assign(o,d);
-  commit();toast("Saved");
- };
-}
-$("add").onclick=()=>openForm();
+// ---- stock engine (one shared inventory across all locations)
+function move(pid,loc,qty,type,ref){const p=pById(pid);if(!p)return;p.stock[loc]=(p.stock[loc]||0)+qty;
+ DB.moves.unshift({id:uid(),ts:Date.now(),date:today(),pid,loc,qty,type,ref:ref||""});if(DB.moves.length>3000)DB.moves.length=3000}
+const baseName=d=>String(d).replace(/ \(.*/,"").trim().toLowerCase();
+const findProd=desc=>DB.products.find(p=>p.name.toLowerCase()===baseName(desc));
+function afterStatus(o){const p=findProd(o.desc);if(!p)return;
+ if((o.status==="In Progress"||o.status==="Delivered")&&!o.stocked){move(p.id,SET.onlineLoc,-o.qty,"online sale",o.no);o.stocked=true}
+ if(o.status==="RETURN"&&o.stocked&&!o.restocked){move(p.id,SET.onlineLoc,o.qty,"online return",o.no);o.restocked=true}}
+function logDispatch(o){DB.dispatches.unshift({id:uid(),ts:Date.now(),date:today(),no:o.no,cust:o.cust,phone:o.phone,courier:o.courier,track:o.track,cod:o.cb==="COD"?Number(o.amount):0})}
 
-// ---------- toolbar ----------
-// Stand-in for syncAllStatuses(): here it just re-derives nothing; wire to Shopify via your Apps Script web app.
-$("sync").onclick=()=>toast("Demo mode – connect to Apps Script to sync");
-$("csv").onclick=()=>{
- const csv=[HEADERS,...orders.map(o=>KEYS.map(k=>o[k]))].map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="handpicked-orders.csv";a.click();
+// ---- money engine
+const posLive=()=>DB.posSales.filter(s=>!s.void);
+const saleCost=s=>s.items.reduce((a,i)=>a+i.cost*i.qty,0);
+function billRows(){const out=[];DB.vendors.forEach(v=>{let pool=DB.vpay.filter(x=>x.vendor===v.id).reduce((s,x)=>s+Number(x.amount),0);
+ DB.bills.filter(b=>b.vendor===v.id).sort((a,b)=>a.date.localeCompare(b.date)).forEach(b=>{const p=Math.min(b.total,pool);pool-=p;out.push({...b,paid:p,due:b.total-p,terms:v.terms})})});return out}
+const vendorBal=v=>DB.bills.filter(b=>b.vendor===v).reduce((s,b)=>s+b.total,0)-DB.vpay.filter(x=>x.vendor===v).reduce((s,x)=>s+Number(x.amount),0);
+const payables=()=>DB.vendors.reduce((s,v)=>s+vendorBal(v.id),0);
+const invValue=()=>DB.products.reduce((s,p)=>s+totalStock(p)*p.cost,0);
+const lowStock=()=>DB.products.filter(p=>totalStock(p)<=p.reorder);
+
+// generic order table
+function tbl(rows,{cols=SET.cols,select=false,extra=[]}={}){
+ if(!rows.length)return'<div class="wrap"><div class="empty">No orders match.</div></div>';
+ const head=(select?`<th class="ck"><input type="checkbox" data-all></th>`:"")+cols.map(k=>`<th>${HEADERS[KEYS.indexOf(k)]}</th>`).join("")+extra.map(e=>`<th>${e.h}</th>`).join("");
+ const body=rows.map(o=>`<tr class="row" data-no="${esc(o.no)}" style="background:var(--${cls(o.status)})">`+(select?`<td class="ck"><input type="checkbox" data-sel="${esc(o.no)}" ${sel.has(o.no)?"checked":""}></td>`:"")+
+  cols.map(k=>k==="status"?`<td>${badge(o.status)}</td>`:`<td>${esc(k==="date"?fmtDate(o.date):k==="amount"?num(o.amount):o[k])}</td>`).join("")+extra.map(e=>`<td>${e.f(o)}</td>`).join("")+"</tr>").join("");
+ return`<div class="wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`}
+const selRows=()=>DB.orders.filter(o=>sel.has(o.no));
+
+// ===================== VIEWS =====================
+const V={};let vis=[];
+
+// ---------- Dashboard
+V.dashboard=()=>{
+ const L=live(),months={};L.forEach(o=>{const m=monthOf(o.date);months[m]=(months[m]||0)+Number(o.amount)});
+ const ret=DB.orders.filter(o=>o.status==="RETURN"),shipped=DB.orders.filter(isShipped);
+ const rev=sum(L),profit=rev*(1-SET.costPct/100)-SET.courierFee*shipped.length-SET.returnFee*ret.length;
+ const stale=DB.orders.filter(o=>ready(o)&&age(o.date)>=SET.staleDays),noTrack=DB.orders.filter(o=>o.status==="In Progress"&&!o.track),due=DB.orders.filter(codDue);
+ const prod={};L.forEach(o=>{const k=o.desc.replace(/ \(.*/,"");prod[k]=(prod[k]||0)+Number(o.amount)});
+ const mk=Object.entries(months).slice(-6),mx=Math.max(1,...mk.map(m=>m[1])),ps=posLive().filter(s=>s.date===today());
+ const alerts=[[stale.length,`${stale.length} order(s) waiting to ship for ${SET.staleDays}+ days`,"dispatch"],[noTrack.length,`${noTrack.length} in-progress order(s) have no tracking ID`,"dispatch"],
+  [due.length,`${due.length} delivered COD order(s) worth ${pkr(sum(due))} not reconciled with the courier`,"recon"],[lowStock().length,`${lowStock().length} product(s) at or below reorder level`,"inventory"],
+  [DB.vendors.filter(v=>vendorBal(v.id)>0).length,`${pkr(payables())} owed to vendors`,"vendors"]].filter(a=>a[0]);
+ return`<div class="cards">
+ <div class="card"><small>Online orders</small><b>${DB.orders.length}</b></div><div class="card"><small>Online revenue</small><b>${pkr(rev)}</b></div>
+ <div class="card"><small>Est. online profit</small><b class="${profit>=0?"good":"bad"}">${pkr(profit)}</b></div>
+ <div class="card"><small>POS sales today</small><b>${pkr(ps.reduce((s,x)=>s+x.total,0))}</b></div>
+ <div class="card"><small>Return rate</small><b>${shipped.length?Math.round(ret.length/shipped.length*100):0}%</b></div>
+ <div class="card"><small>COD unreconciled</small><b>${pkr(sum(due))}</b></div>
+ <div class="card"><small>Inventory value (cost)</small><b>${pkr(invValue())}</b></div><div class="card"><small>Owed to vendors</small><b>${pkr(payables())}</b></div></div>
+ <div class="card" style="margin-bottom:16px"><h3>Needs attention</h3>${alerts.map(a=>`<div class="alert"><span>⚠️ ${a[1]}</span><button class="s" data-go="${a[2]}">Open</button></div>`).join("")||'<span class="muted">All clear 🎉</span>'}</div>
+ <div class="grid2">
+ <div class="card"><h3>Online revenue by month</h3><div class="cols">${mk.map(([m,v])=>`<div><i style="height:${v/mx*120}px"></i>${m}<br>${Math.round(v/1000)}k</div>`).join("")}</div></div>
+ <div class="card"><h3>Orders by status</h3>${hbars(STATUSES.map(s=>[s,DB.orders.filter(o=>o.status===s).length]))}</div>
+ <div class="card"><h3>Top online products</h3>${hbars(Object.entries(prod).sort((a,b)=>b[1]-a[1]).slice(0,6),pkr)}</div>
+ <div class="card"><h3>COD vs Online</h3>${hbars([["COD",sum(L.filter(o=>o.cb==="COD"))],["ONLINE",sum(L.filter(o=>o.cb==="ONLINE"))]],pkr)}
+ <h3 style="margin-top:14px">Shipped by courier</h3>${hbars(Object.entries(shipped.reduce((a,o)=>(a[o.courier||"—"]=(a[o.courier||"—"]||0)+1,a),{})))}</div></div>
+ <p class="muted">Online profit estimate = revenue × (1 − ${SET.costPct}% product cost) − ${pkr(SET.courierFee)} × shipped − ${pkr(SET.returnFee)} × returns. See Finance for the combined online + POS picture.</p>`};
+
+// ---------- Orders
+const F={q:"",st:"",cb:"",co:"",from:"",to:"",sort:"new",month:"All"};
+V.orders=()=>{const months=["All",...new Set(DB.orders.map(o=>monthOf(o.date)))];setTimeout(drawOrders);
+ return`<div class="bar tabs">${months.map(m=>`<button class="${m===F.month?"on":""}" data-month="${m}">${m}</button>`).join("")}</div>
+ <div class="bar"><input data-f="q" placeholder="Search order, name, phone, tracking, product…" value="${esc(F.q)}" style="flex:1;min-width:220px">
+ <select data-f="st"><option value="">All statuses</option>${opts(STATUSES,F.st)}</select><select data-f="cb"><option value="">COD + Online</option>${opts(["COD","ONLINE"],F.cb)}</select>
+ <select data-f="co"><option value="">All couriers</option>${opts(SET.couriers,F.co)}</select><input type="date" data-f="from" value="${F.from}" title="From"><input type="date" data-f="to" value="${F.to}" title="To">
+ <select data-f="sort">${[["new","Newest first"],["old","Oldest first"],["hi","Amount: high→low"],["lo","Amount: low→high"]].map(([v,l])=>`<option value="${v}" ${F.sort===v?"selected":""}>${l}</option>`).join("")}</select></div>
+ <div id="bulk"></div><div id="ot"></div>`};
+function drawOrders(){if(!$("#ot"))return;const q=F.q.toLowerCase();
+ vis=DB.orders.filter(o=>(F.month==="All"||monthOf(o.date)===F.month)&&(!F.st||o.status===F.st)&&(!F.cb||o.cb===F.cb)&&(!F.co||o.courier===F.co)&&(!F.from||o.date>=F.from)&&(!F.to||o.date<=F.to)&&
+  (!q||[o.no,o.cust,o.phone,o.track,o.desc].join(" ").toLowerCase().includes(q)));
+ const nc=(a,b)=>a.no.localeCompare(b.no,undefined,{numeric:true});
+ vis.sort((a,b)=>F.sort==="old"?a.date.localeCompare(b.date)||nc(a,b):F.sort==="hi"?b.amount-a.amount:F.sort==="lo"?a.amount-b.amount:b.date.localeCompare(a.date)||nc(b,a));
+ $("#ot").innerHTML=`<p class="muted">${vis.length} order(s) · ${pkr(sum(vis))}</p>`+tbl(vis,{select:true});drawBulk()}
+function drawBulk(){const b=$("#bulk");if(!b)return;
+ b.innerHTML=sel.size?`<div class="bulk"><b>${sel.size} selected</b><select id="bs"><option value="">Set status…</option>${opts(STATUSES)}</select><select id="bc"><option value="">Set courier…</option>${opts(SET.couriers)}</select>
+ <button data-act="bulkApply">Apply</button><button data-act="bulkSettle">Mark COD settled</button><button data-act="bulkCsv">Export CSV</button><button data-act="bulkSlip">Print slips</button>
+ <button class="d" data-act="bulkDel">Delete</button><button data-act="clearSel">Clear</button></div>`:""}
+
+// ---------- Dispatch (+ dispatch record)
+const DR={q:"",from:"",to:""};
+V.dispatch=()=>{const rd=DB.orders.filter(ready).sort((a,b)=>a.date.localeCompare(b.date));vis=rd;
+ const ip=DB.orders.filter(o=>o.status==="In Progress"),by={};ip.forEach(o=>by[o.courier||"—"]=(by[o.courier||"—"]||0)+1);setTimeout(drawDispLog);
+ return`<div class="cards"><div class="card"><small>Ready to ship</small><b>${rd.length}</b></div><div class="card"><small>Waiting ${SET.staleDays}+ days</small><b>${rd.filter(o=>age(o.date)>=SET.staleDays).length}</b></div>
+ <div class="card"><small>In transit</small><b>${ip.length}</b></div>${Object.entries(by).map(([c,n])=>`<div class="card"><small>${esc(c)}</small><b>${n}</b></div>`).join("")}</div>
+ <h3>Ready to dispatch</h3><div class="bar"><button class="p" data-act="dispSave">Save & mark dispatched</button><button data-act="dispPrint">Print dispatch list</button><button data-act="dispSlips">Print slips</button>
+ <span class="muted">Enter tracking IDs + courier; rows with a tracking ID become “In Progress”, are logged in the dispatch record and deduct stock.</span></div>`+
+ tbl(rd,{cols:["no","date","desc","cust","phone","amount","cb"],extra:[{h:"Courier",f:o=>`<select data-dc="${esc(o.no)}">${opts(SET.couriers,o.courier||SET.couriers[0])}</select>`},{h:"Tracking ID",f:o=>`<input data-dt="${esc(o.no)}" placeholder="Tracking ID">`},{h:"Waiting",f:o=>age(o.date)+"d"}]})+
+ `<h3>Dispatch record</h3><div class="bar"><input id="dq" placeholder="Search order, customer, tracking…" value="${esc(DR.q)}" style="flex:1;min-width:200px"><input type="date" id="dfrom" value="${DR.from}"><input type="date" id="dto" value="${DR.to}">
+ <button data-act="dlogCsv">Export CSV</button><button data-act="dlogPrint">Print</button></div><div id="dlog"></div>`};
+const dLogRows=()=>{const q=DR.q.toLowerCase();return DB.dispatches.filter(d=>(!DR.from||d.date>=DR.from)&&(!DR.to||d.date<=DR.to)&&(!q||(d.no+d.cust+d.track+d.courier).toLowerCase().includes(q)))};
+function drawDispLog(){const t=$("#dlog");if(!t)return;DR.q=$("#dq").value;DR.from=$("#dfrom").value;DR.to=$("#dto").value;const rs=dLogRows();
+ t.innerHTML=`<p class="muted">${rs.length} dispatched · COD value ${pkr(rs.reduce((s,d)=>s+d.cod,0))}</p>`+T(["Date","Time","Order","Customer","Courier","Tracking ID","COD amount"],rs.slice(0,150).map(d=>`<tr><td>${fmtDate(d.date)}</td><td>${new Date(d.ts).toTimeString().slice(0,5)}</td><td>${esc(d.no)}</td><td>${esc(d.cust)}</td><td>${esc(d.courier)}</td><td>${esc(d.track)}</td><td class="r">${d.cod?num(d.cod):"prepaid"}</td></tr>`),[6])}
+
+// ---------- COD reconciliation
+const RC={courier:"",date:today(),ref:"",received:""};
+V.recon=()=>{const due=DB.orders.filter(codDue),tr=DB.orders.filter(inTransit),by={};
+ due.forEach(o=>{const c=o.courier||"—";(by[c]=by[c]||{n:0,v:0,old:0});by[c].n++;by[c].v+=Number(o.amount);by[c].old=Math.max(by[c].old,age(o.date))});
+ vis=RC.courier?due.filter(o=>(o.courier||"—")===RC.courier).sort((a,b)=>a.date.localeCompare(b.date)):[];setTimeout(drawRecon);
+ const short=DB.remits.filter(r=>r.received<r.expected);
+ return`<div class="cards"><div class="card"><small>COD in transit</small><b>${pkr(sum(tr))}</b></div><div class="card"><small>Delivered — awaiting remittance</small><b class="warn">${pkr(sum(due))}</b></div>
+ <div class="card"><small>Received from couriers</small><b class="good">${pkr(DB.remits.reduce((s,r)=>s+r.received,0))}</b></div><div class="card"><small>Short-paid (total)</small><b class="${short.length?"bad":""}">${pkr(short.reduce((s,r)=>s+(r.expected-r.received),0))}</b></div></div>
+ <h3>Outstanding by courier</h3>${T(["Courier","Orders","Amount","Oldest (days)",""],Object.entries(by).map(([c,x])=>`<tr><td>${esc(c)}</td><td>${x.n}</td><td>${num(x.v)}</td><td class="${x.old>14?"bad":""}">${x.old}</td><td><button class="s" data-rccour="${esc(c)}">Reconcile</button></td></tr>`))}
+ <div class="card form"><h3>Record a courier remittance</h3><div class="bar"><select id="rcc"><option value="">Choose courier…</option>${Object.keys(by).map(c=>`<option ${c===RC.courier?"selected":""}>${esc(c)}</option>`).join("")}</select>
+ <input type="date" id="rcd" value="${RC.date}"><input id="rcr" placeholder="Remittance / bank ref" value="${esc(RC.ref)}"><input id="rcv" type="number" placeholder="Amount received (PKR)" value="${esc(RC.received)}"></div>
+ <p class="muted">Tick the delivered orders covered by this payment. Expected = order amounts${SET.feeDeducted?` − ${pkr(SET.courierFee)} courier fee per order`:""}. Any difference is recorded as a variance.</p>
+ ${RC.courier?tbl(vis,{cols:["no","date","cust","track","amount"],select:true,extra:[{h:"Age",f:o=>age(o.date)+"d"}]}):'<div class="empty">Pick a courier to list its unreconciled orders.</div>'}
+ <div id="rcsum"></div></div>
+ <h3>Reconciliation history</h3>`+T(["Date","Courier","Reference","Orders","Expected","Received","Variance",""],DB.remits.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(r=>{const v=r.received-r.expected;
+  return`<tr><td>${fmtDate(r.date)}</td><td>${esc(r.courier)}</td><td>${esc(r.ref)}</td><td>${r.orders.length}</td><td class="r">${num(r.expected)}</td><td class="r">${num(r.received)}</td><td class="r ${v<0?"bad":v>0?"good":""}">${v>0?"+":""}${num(v)}</td><td><button class="s d" data-undoremit="${r.id}">Undo</button></td></tr>`}),[4,5,6])};
+function drawRecon(){const s=$("#rcsum");if(!s)return;const rows=selRows(),gross=sum(rows),fee=SET.feeDeducted?SET.courierFee*rows.length:0,exp=gross-fee,rec=Number(RC.received)||0,diff=rec-exp;
+ s.innerHTML=rows.length?`<div class="cards" style="margin-top:12px"><div class="card"><small>Selected</small><b>${rows.length} · ${pkr(gross)}</b></div><div class="card"><small>Courier fees</small><b>− ${pkr(fee)}</b></div>
+ <div class="card"><small>Expected</small><b>${pkr(exp)}</b></div><div class="card"><small>Variance vs received</small><b class="${RC.received===""?"":diff<0?"bad":"good"}">${RC.received===""?"—":(diff>0?"+":"")+pkr(diff)}</b></div></div>
+ <button class="p" data-act="reconSave">Reconcile & mark settled</button>`:""}
+
+// ---------- Returns
+V.returns=()=>{const ret=DB.orders.filter(o=>o.status==="RETURN"),shipped=DB.orders.filter(isShipped);
+ const grp=f=>Object.entries(shipped.reduce((a,o)=>{const k=f(o)||"—";(a[k]=a[k]||[0,0]);a[k][0]++;if(o.status==="RETURN")a[k][1]++;return a},{})).map(([k,[t,r]])=>[k,Math.round(r/t*100)]).sort((a,b)=>b[1]-a[1]);
+ const rs={};ret.forEach(o=>rs[o.reason||"Unspecified"]=(rs[o.reason||"Unspecified"]||0)+1);
+ return`<div class="cards"><div class="card"><small>Returns</small><b>${ret.length}</b></div><div class="card"><small>Return rate</small><b>${shipped.length?Math.round(ret.length/shipped.length*100):0}%</b></div>
+ <div class="card"><small>Revenue lost</small><b>${pkr(sum(ret))}</b></div><div class="card"><small>Return shipping cost</small><b>${pkr(ret.length*SET.returnFee)}</b></div></div>
+ <div class="grid2"><div class="card"><h3>Reasons</h3>${hbars(Object.entries(rs))}</div><div class="card"><h3>Return % by courier</h3>${hbars(grp(o=>o.courier),v=>v+"%")}</div>
+ <div class="card"><h3>Return % by product</h3>${hbars(grp(o=>o.desc.replace(/ \(.*/,"")),v=>v+"%")}</div></div>`+
+ tbl(ret,{cols:["no","date","desc","cust","phone","courier","amount"],extra:[{h:"Reason",f:o=>`<select data-reason="${esc(o.no)}"><option value="">—</option>${opts(REASONS,o.reason)}</select>`}]})};
+
+// ---------- Customers (online + POS is anonymous)
+function customers(){const m={};DB.orders.forEach(o=>{const k=o.phone||o.cust,c=m[k]||(m[k]={phone:o.phone,name:o.cust,n:0,spent:0,ret:0,last:""});
+ c.n++;if(!dead(o))c.spent+=Number(o.amount);if(o.status==="RETURN")c.ret++;if(o.date>c.last)c.last=o.date});return Object.values(m)}
+V.customers=()=>{setTimeout(drawCust);return`<div class="bar"><input id="cq" placeholder="Search name or phone…" style="flex:1;min-width:220px"><select id="cf"><option value="">All</option><option>VIP</option><option>Risky</option><option>Blocked</option></select></div><div id="ct"></div>`};
+function drawCust(){const t=$("#ct");if(!t)return;const q=($("#cq").value||"").toLowerCase(),f=$("#cf").value;
+ const rows=customers().map(c=>({...c,blk:SET.blocked.includes(c.phone),tag:SET.blocked.includes(c.phone)?"Blocked":(c.ret>=2||(c.n>=2&&c.ret/c.n>=.5))?"Risky":c.n>=3?"VIP":c.n>1?"Repeat":"New"}))
+  .filter(c=>(!q||(c.name+c.phone).toLowerCase().includes(q))&&(!f||c.tag===f)).sort((a,b)=>b.spent-a.spent);
+ t.innerHTML=T(["Customer","Phone","Orders","Spent","Returns","Last order","Tag",""],rows.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${c.n}</td><td>${num(c.spent)}</td><td>${c.ret}</td><td>${fmtDate(c.last)}</td>
+ <td>${tag(c.tag,c.tag==="VIP"?"vip":c.tag==="Risky"?"risk":c.tag==="Blocked"?"blk":"new")}</td><td><button class="s" data-wa="${esc(c.phone)}">WhatsApp</button> <button class="s ${c.blk?"":"d"}" data-block="${esc(c.phone)}">${c.blk?"Unblock":"Block"}</button></td></tr>`))}
+
+// ---------- Product report (online + POS)
+V.products=()=>{const m={};const g=k=>m[k]||(m[k]={on:0,onRev:0,pos:0,posRev:0,ret:0,ship:0});
+ DB.orders.forEach(o=>{const p=g(o.desc.replace(/ \(.*/,""));if(!dead(o)){p.on+=Number(o.qty);p.onRev+=Number(o.amount)}if(o.status==="RETURN")p.ret++;if(isShipped(o))p.ship++});
+ posLive().forEach(s=>s.items.forEach(i=>{const p=g(i.name);p.pos+=i.qty;p.posRev+=i.qty*i.price}));
+ return T(["Product","Online units","Online revenue","POS units","POS revenue","Total revenue","Online return %"],Object.entries(m).sort((a,b)=>(b[1].onRev+b[1].posRev)-(a[1].onRev+a[1].posRev)).map(([k,p])=>{const r=p.ship?Math.round(p.ret/p.ship*100):0;
+  return`<tr><td>${esc(k)}</td><td>${p.on}</td><td class="r">${num(p.onRev)}</td><td>${p.pos}</td><td class="r">${num(p.posRev)}</td><td class="r"><b>${num(p.onRev+p.posRev)}</b></td><td class="${r>=20?"bad":""}">${r}%</td></tr>`}),[2,4,5])};
+
+// ---------- WhatsApp
+const W={q:"",st:"Pending"};
+V.whatsapp=()=>{setTimeout(drawWa);return`<p class="muted">One-click messages via WhatsApp. Edit the templates in Settings.</p><div class="bar"><input id="wq" placeholder="Search…" value="${esc(W.q)}" style="flex:1;min-width:200px"><select id="ws"><option value="">All statuses</option>${opts(STATUSES,W.st)}</select></div><div id="wt"></div>`};
+function drawWa(){const t=$("#wt");if(!t)return;W.q=$("#wq").value;W.st=$("#ws").value;const q=W.q.toLowerCase();
+ const rows=DB.orders.filter(o=>(!W.st||o.status===W.st)&&(!q||(o.no+o.cust+o.phone).toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,60);
+ t.innerHTML=tbl(rows,{cols:["no","cust","phone","amount","status"],extra:[{h:"Send",f:o=>`<button class="s" data-tpl="confirm" data-wo="${esc(o.no)}">Confirm</button> <button class="s" data-tpl="ship" data-wo="${esc(o.no)}">Dispatched</button> <button class="s" data-tpl="follow" data-wo="${esc(o.no)}">Feedback</button>`}]}).replace(/class="row"/g,"")}
+
+// ---------- POS
+const P={store:null,cart:[],q:"",method:"Cash",disc:0,day:today(),last:null};
+V.pos=()=>{if(!P.store||!DB.stores.some(s=>s.id===P.store))P.store=(DB.stores.find(s=>s.id!==SET.onlineLoc)||DB.stores[0]).id;setTimeout(drawPos);
+ return`<div class="bar"><label class="chk">Selling from <select id="ps" style="width:auto">${kv(storeKV(),P.store)}</select></label><label class="chk">Report day <input type="date" id="pd" value="${P.day}"></label>
+ <span class="muted">Stock is shared across all locations — every sale deducts from the selected store.</span></div>
+ <div class="grid2"><div class="card"><h3>Add items</h3><input id="pq" placeholder="Scan barcode / type SKU or name, press Enter" style="width:100%;margin-bottom:8px" value="${esc(P.q)}"><div class="scroll" id="pg"></div></div>
+ <div class="card"><h3>Current sale</h3><div id="pc"></div></div></div><div id="pday"></div>`};
+function drawPos(){if(!$("#pg"))return;const q=P.q.toLowerCase();
+ $("#pg").innerHTML=T(["SKU","Product","Price","Stock here",""],DB.products.filter(p=>!q||(p.name+p.sku).toLowerCase().includes(q)).slice(0,40).map(p=>{const s=stockOf(p,P.store);
+  return`<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td class="r">${num(p.price)}</td><td class="${s<=0?"bad":s<=p.reorder?"warn":""}">${s}</td><td><button class="s" data-act="cartAdd" data-id="${p.id}">Add</button></td></tr>`}),[2]);
+ drawCart();drawDay()}
+const cartTotal=()=>Math.max(0,P.cart.reduce((s,i)=>s+i.qty*i.price,0)-(+P.disc||0));
+function drawCart(){const c=$("#pc");if(!c)return;
+ c.innerHTML=(P.cart.length?T(["Item","Qty","Price","Total",""],P.cart.map(i=>`<tr><td>${esc(pById(i.pid).name)}</td><td><button class="s" data-act="cartDec" data-id="${i.pid}">−</button> ${i.qty} <button class="s" data-act="cartInc" data-id="${i.pid}">+</button></td>
+  <td class="r">${num(i.price)}</td><td class="r">${num(i.qty*i.price)}</td><td><button class="s d" data-act="cartDel" data-id="${i.pid}">✕</button></td></tr>`),[2,3]):'<div class="empty">Cart is empty.</div>')+
+ `<div class="two"><div><label>Discount (PKR)</label><input id="pdisc" type="number" min="0" value="${P.disc||""}"></div><div><label>Payment method</label><select id="pm">${opts(POSM,P.method)}</select></div></div>
+ <p>Total: <span class="big" id="ptotal">${pkr(cartTotal())}</span></p><div class="bar"><button class="p" data-act="posComplete">Complete sale</button><button data-act="cartClear">Clear</button>${P.last?'<button data-act="posReceipt">Print last receipt</button>':""}</div>`}
+function drawDay(){const d=$("#pday");if(!d)return;const all=posLive().filter(s=>s.date===P.day),mine=DB.posSales.filter(s=>s.date===P.day&&s.store===P.store).sort((a,b)=>b.time.localeCompare(a.time));
+ const row=(name,ss)=>{const rev=ss.reduce((s,x)=>s+x.total,0),cash=ss.filter(x=>x.method==="Cash").reduce((s,x)=>s+x.total,0),cost=ss.reduce((s,x)=>s+saleCost(x),0);
+  return`<tr><td>${esc(name)}</td><td>${ss.length}</td><td>${ss.reduce((s,x)=>s+x.items.reduce((a,i)=>a+i.qty,0),0)}</td><td class="r">${num(rev)}</td><td class="r">${num(cash)}</td><td class="r">${num(rev-cash)}</td><td class="r ${rev-cost>=0?"good":"bad"}">${num(rev-cost)}</td></tr>`};
+ d.innerHTML=`<h3>Day summary — ${fmtDate(P.day)}</h3>`+T(["Store","Sales","Units","Revenue","Cash in till","Card / transfer","Gross profit"],[...DB.stores.map(s=>row(s.name,all.filter(x=>x.store===s.id))),row("All stores",all)],[3,4,5,6])+
+ `<div class="bar"><b>Sales at ${esc(storeName(P.store))}</b><button data-act="posCsv">Export all POS sales CSV</button></div>`+
+ T(["No","Time","Items","Method","Total",""],mine.map(s=>`<tr style="${s.void?"opacity:.5;text-decoration:line-through":""}"><td>${s.no}</td><td>${s.time}</td><td>${esc(s.items.map(i=>i.qty+"× "+i.name).join(", "))}</td><td>${s.method}</td><td class="r">${num(s.total)}</td>
+  <td>${s.void?"voided":`<button class="s d" data-voidsale="${s.id}">Void</button>`}</td></tr>`),[4])}
+
+// ---------- Inventory
+const IV={q:"",loc:"",low:false,moves:false};
+V.inventory=()=>{setTimeout(drawInv);const tot=DB.products.reduce((s,p)=>s+totalStock(p),0),ret=DB.products.reduce((s,p)=>s+totalStock(p)*p.price,0);
+ return`<div class="cards"><div class="card"><small>Products</small><b>${DB.products.length}</b></div><div class="card"><small>Units in stock (all locations)</small><b>${num(tot)}</b></div>
+ <div class="card"><small>Stock value (cost)</small><b>${pkr(invValue())}</b></div><div class="card"><small>Stock value (retail)</small><b>${pkr(ret)}</b></div><div class="card"><small>Low / out of stock</small><b class="${lowStock().length?"bad":""}">${lowStock().length}</b></div></div>
+ <div class="bar"><input id="iq" placeholder="Search SKU or name…" style="flex:1;min-width:200px" value="${esc(IV.q)}"><label class="chk"><input type="checkbox" id="il" ${IV.low?"checked":""}> Low stock only</label>
+ <button class="p" data-act="newProduct">+ Product</button><button data-act="transfer">⇄ Transfer stock</button><button data-act="invCsv">Export CSV</button><button data-act="toggleMoves">${IV.moves?"Hide":"Show"} movements</button></div><div id="it"></div><div id="im"></div>`};
+function drawInv(){const t=$("#it");if(!t)return;IV.q=$("#iq").value;IV.low=$("#il").checked;const q=IV.q.toLowerCase();
+ const ps=DB.products.filter(p=>(!q||(p.name+p.sku).toLowerCase().includes(q))&&(!IV.low||totalStock(p)<=p.reorder));
+ t.innerHTML=T(["SKU","Product","Vendor","Cost","Price",...DB.stores.map(s=>esc(s.name)),"Total","Value","Status",""],ps.map(p=>{const tt=totalStock(p);
+  return`<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${esc((vById(p.vendor)||{}).name||"—")}</td><td class="r">${num(p.cost)}</td><td class="r">${num(p.price)}</td>${DB.stores.map(s=>`<td class="r ${stockOf(p,s.id)<=0?"muted":""}">${stockOf(p,s.id)}</td>`).join("")}
+  <td class="r"><b>${tt}</b></td><td class="r">${num(tt*p.cost)}</td><td>${tt<=0?tag("Out","bad"):tt<=p.reorder?tag("Low","warn"):tag("OK","ok")}</td><td><button class="s" data-editprod="${p.id}">Edit</button></td></tr>`}),[3,4,...DB.stores.map((_,i)=>5+i),5+DB.stores.length,6+DB.stores.length]);
+ const m=$("#im");m.innerHTML=IV.moves?`<h3>Stock movements</h3>`+T(["Date","Product","Location","Qty","Type","Ref"],DB.moves.slice(0,120).map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${esc((pById(x.pid)||{}).name)}</td><td>${esc(storeName(x.loc))}</td><td class="r ${x.qty<0?"bad":"good"}">${x.qty>0?"+":""}${x.qty}</td><td>${esc(x.type)}</td><td>${esc(x.ref)}</td></tr>`),[3]):""}
+
+// ---------- Vendors & payables
+V.vendors=()=>{const bills=billRows(),ms=monthStart(),over=bills.filter(b=>b.due>0&&age(b.date)>b.terms);
+ return`<div class="cards"><div class="card"><small>Total payable</small><b class="${payables()>0?"warn":""}">${pkr(payables())}</b></div><div class="card"><small>Overdue bills</small><b class="${over.length?"bad":""}">${pkr(over.reduce((s,b)=>s+b.due,0))}</b></div>
+ <div class="card"><small>Purchased this month</small><b>${pkr(DB.bills.filter(b=>b.date>=ms).reduce((s,b)=>s+b.total,0))}</b></div><div class="card"><small>Paid this month</small><b>${pkr(DB.vpay.filter(x=>x.date>=ms).reduce((s,x)=>s+Number(x.amount),0))}</b></div></div>
+ <div class="bar"><button class="p" data-act="newBill">+ Purchase bill</button><button data-act="newPay">+ Payment to vendor</button><button data-act="newVendor">+ Vendor</button></div>
+ <h3>Vendor ledger</h3>`+T(["Vendor","Phone","Terms","Billed","Paid","Balance",""],DB.vendors.map(v=>{const b=DB.bills.filter(x=>x.vendor===v.id).reduce((s,x)=>s+x.total,0),bal=vendorBal(v.id);
+  return`<tr><td>${esc(v.name)}</td><td>${esc(v.phone)}</td><td>${v.terms}d</td><td class="r">${num(b)}</td><td class="r">${num(b-bal)}</td><td class="r ${bal>0?"warn":"good"}"><b>${num(bal)}</b></td>
+  <td><button class="s" data-act="newBill" data-id="${v.id}">Bill</button> <button class="s" data-act="newPay" data-id="${v.id}">Pay</button> <button class="s" data-stmt="${v.id}">Statement</button> <button class="s" data-editvendor="${v.id}">Edit</button></td></tr>`}),[3,4,5])+
+ `<h3>Purchase bills</h3>`+T(["Date","Vendor","Ref","Items","Total","Paid","Due","Status",""],bills.sort((a,b)=>b.date.localeCompare(a.date)).map(b=>{const od=b.due>0&&age(b.date)>b.terms;
+  return`<tr><td>${fmtDate(b.date)}</td><td>${esc((vById(b.vendor)||{}).name)}</td><td>${esc(b.ref)}</td><td>${esc(b.items.map(i=>i.qty+"× "+(pById(i.pid)||{name:"?"}).name).join(", "))}</td><td class="r">${num(b.total)}</td><td class="r">${num(b.paid)}</td><td class="r">${num(b.due)}</td>
+  <td>${b.due<=0?tag("Paid","ok"):od?tag("Overdue","bad"):b.paid>0?tag("Partial","warn"):tag("Unpaid","new")}</td><td><button class="s d" data-delbill="${b.id}">Delete</button></td></tr>`}),[4,5,6])+
+ `<h3>Payments made to vendors</h3>`+T(["Date","Vendor","Method","Reference","Note","Amount",""],DB.vpay.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${esc((vById(x.vendor)||{}).name)}</td><td>${esc(x.method)}</td><td>${esc(x.ref)}</td><td>${esc(x.note)}</td><td class="r">${num(x.amount)}</td><td><button class="s d" data-delpay="${x.id}">Delete</button></td></tr>`),[5])};
+
+// ---------- Finance (online + POS + vendors)
+const FI={p:"month"};
+V.finance=()=>{const inP=d=>FI.p==="all"||d>=monthStart();
+ const on=live().filter(o=>inP(o.date)),pos=posLive().filter(s=>inP(s.date));
+ const onRev=sum(on),posRev=pos.reduce((s,x)=>s+x.total,0),onCogs=onRev*SET.costPct/100,posCogs=pos.reduce((s,x)=>s+saleCost(x),0);
+ const shipped=DB.orders.filter(o=>inP(o.date)&&isShipped(o)).length,rets=DB.orders.filter(o=>inP(o.date)&&o.status==="RETURN").length,shipCost=SET.courierFee*shipped+SET.returnFee*rets;
+ const gross=onRev+posRev-onCogs-posCogs,net=gross-shipCost;
+ const cashIn=DB.remits.filter(r=>inP(r.date)).reduce((s,r)=>s+r.received,0)+sum(DB.orders.filter(o=>o.cb==="ONLINE"&&!dead(o)&&inP(o.date)))+posRev,cashOut=DB.vpay.filter(x=>inP(x.date)).reduce((s,x)=>s+Number(x.amount),0);
+ const recv=sum(DB.orders.filter(codDue))+sum(DB.orders.filter(inTransit));
+ return`<div class="bar tabs"><button data-fi="month" class="${FI.p==="month"?"on":""}">This month</button><button data-fi="all" class="${FI.p==="all"?"on":""}">All time</button></div>
+ <div class="cards"><div class="card"><small>Total revenue</small><b>${pkr(onRev+posRev)}</b></div><div class="card"><small>Gross profit</small><b class="${gross>=0?"good":"bad"}">${pkr(gross)}</b></div>
+ <div class="card"><small>Shipping & return costs</small><b>${pkr(shipCost)}</b></div><div class="card"><small>Net operating profit (est.)</small><b class="${net>=0?"good":"bad"}">${pkr(net)}</b></div></div>
+ <h3>Cash position</h3><div class="cards"><div class="card"><small>Cash in (couriers + online paid + POS)</small><b class="good">${pkr(cashIn)}</b></div><div class="card"><small>Paid to vendors</small><b class="bad">${pkr(cashOut)}</b></div>
+ <div class="card"><small>Net cash movement</small><b class="${cashIn-cashOut>=0?"good":"bad"}">${pkr(cashIn-cashOut)}</b></div></div>
+ <h3>Balance sheet snapshot</h3><div class="cards"><div class="card"><small>Receivable (COD with couriers)</small><b>${pkr(recv)}</b></div><div class="card"><small>Payable to vendors</small><b>${pkr(payables())}</b></div>
+ <div class="card"><small>Inventory at cost</small><b>${pkr(invValue())}</b></div><div class="card"><small>Working capital (recv + stock − payables)</small><b>${pkr(recv+invValue()-payables())}</b></div></div>
+ <h3>By channel</h3>`+T(["Channel","Orders / sales","Revenue","Cost of goods","Gross profit","Stock value (cost)"],[
+  `<tr><td>Online (Shopify)</td><td>${on.length}</td><td class="r">${num(onRev)}</td><td class="r">${num(onCogs)}</td><td class="r">${num(onRev-onCogs)}</td><td class="r">${num(DB.products.reduce((s,p)=>s+stockOf(p,SET.onlineLoc)*p.cost,0))}</td></tr>`,
+  ...DB.stores.filter(s=>s.id!==SET.onlineLoc).map(s=>{const ss=pos.filter(x=>x.store===s.id),rv=ss.reduce((a,x)=>a+x.total,0),cg=ss.reduce((a,x)=>a+saleCost(x),0);
+   return`<tr><td>${esc(s.name)} (POS)</td><td>${ss.length}</td><td class="r">${num(rv)}</td><td class="r">${num(cg)}</td><td class="r">${num(rv-cg)}</td><td class="r">${num(DB.products.reduce((a,p)=>a+stockOf(p,s.id)*p.cost,0))}</td></tr>`})],[2,3,4,5])+
+ `<p class="muted">Online cost of goods uses your “product cost %” setting; POS uses the actual cost captured at time of sale. Cash-in counts courier remittances actually received, not COD still outstanding.</p>`};
+
+// ---------- Reports & data
+const R={from:monthStart(),to:today()};
+V.reports=()=>{setTimeout(drawRep);return`<div class="bar"><label class="chk">From <input type="date" id="rf" value="${R.from}"></label><label class="chk">To <input type="date" id="rt" value="${R.to}"></label>
+ <button data-act="repCsv">Export summary CSV</button><button data-act="repOrders">Export these orders CSV</button><button data-act="repPrint">Print</button></div><div id="rp"></div>
+ <div class="card form"><h3>Data tools</h3><div class="bar"><button data-act="exportAll">Export all orders (CSV)</button><label class="chk">Import orders CSV <input type="file" id="imp" accept=".csv"></label>
+ <button data-act="backup">Full backup (JSON)</button><label class="chk">Restore <input type="file" id="rest" accept=".json"></label><button class="d" data-act="reset">Reset demo data</button></div>
+ <p class="muted">CSV import expects the same 14 order columns as your sheet; existing order numbers are skipped. The JSON backup includes orders, inventory, POS sales, vendors and settings.</p></div>`};
+const repRows=()=>DB.orders.filter(o=>o.date>=R.from&&o.date<=R.to);
+function drawRep(){const t=$("#rp");if(!t)return;R.from=$("#rf").value||R.from;R.to=$("#rt").value||R.to;const os=repRows(),d={};
+ os.forEach(o=>{const r=d[o.date]||(d[o.date]={n:0,rev:0,cod:0,on:0,ret:0,del:0});r.n++;if(!dead(o)){r.rev+=+o.amount;o.cb==="COD"?r.cod+=+o.amount:r.on+=+o.amount}if(o.status==="RETURN")r.ret++;if(o.status==="Delivered")r.del++});
+ const rows=Object.entries(d).sort((a,b)=>b[0].localeCompare(a[0])),L=os.filter(o=>!dead(o)),pr=posLive().filter(s=>s.date>=R.from&&s.date<=R.to).reduce((s,x)=>s+x.total,0);
+ t.innerHTML=`<div class="cards"><div class="card"><small>Online orders</small><b>${os.length}</b></div><div class="card"><small>Online revenue</small><b>${pkr(sum(L))}</b></div><div class="card"><small>COD</small><b>${pkr(sum(L.filter(o=>o.cb==="COD")))}</b></div>
+ <div class="card"><small>Prepaid</small><b>${pkr(sum(L.filter(o=>o.cb==="ONLINE")))}</b></div><div class="card"><small>Returns</small><b>${os.filter(o=>o.status==="RETURN").length}</b></div><div class="card"><small>POS revenue</small><b>${pkr(pr)}</b></div></div>
+ <div class="wrap"><table id="rtab"><thead><tr><th>Date</th><th>Orders</th><th>Revenue</th><th>COD</th><th>Online</th><th>Delivered</th><th>Returns</th></tr></thead><tbody>`+
+ rows.map(([k,r])=>`<tr><td>${fmtDate(k)}</td><td>${r.n}</td><td>${num(r.rev)}</td><td>${num(r.cod)}</td><td>${num(r.on)}</td><td>${r.del}</td><td>${r.ret}</td></tr>`).join("")+`</tbody></table></div>`}
+
+// ---------- Settings
+V.settings=()=>`<div class="form card"><h3>Store</h3><label>Store / business name</label><input id="s-shop" value="${esc(SET.shop)}">
+ <label>Locations — one per line (first = warehouse / online stock, others = shops)</label><textarea id="s-stores" rows="4">${esc(DB.stores.map(s=>s.name).join("\n"))}</textarea>
+ <label>Online orders deduct stock from</label><select id="s-online">${kv(storeKV(),SET.onlineLoc)}</select>
+ <label>Couriers (comma separated)</label><input id="s-cour" value="${esc(SET.couriers.join(", "))}">
+ <div class="two"><div><label>Courier fee per shipment (PKR)</label><input id="s-cf" type="number" value="${SET.courierFee}"></div><div><label>Return shipping cost (PKR)</label><input id="s-rf" type="number" value="${SET.returnFee}"></div></div>
+ <div class="two"><div><label>Online product cost (% of price)</label><input id="s-cp" type="number" value="${SET.costPct}"></div><div><label>Flag unshipped orders after (days)</label><input id="s-sd" type="number" value="${SET.staleDays}"></div></div>
+ <label class="chk"><input type="checkbox" id="s-fd" ${SET.feeDeducted?"checked":""}> Courier deducts its fee from COD remittances</label>
+ <label>Columns shown in Orders table</label><div>${KEYS.map(k=>`<label class="chk"><input type="checkbox" data-col="${k}" ${SET.cols.includes(k)?"checked":""}>${HEADERS[KEYS.indexOf(k)]}</label>`).join("")}</div>
+ <h3 style="margin-top:14px">WhatsApp templates</h3><p class="muted">Placeholders: {name} {order} {desc} {amount} {cb} {courier} {track} {shop}</p>
+ <label>Order confirmation</label><textarea id="t-confirm" rows="2">${esc(SET.tpl.confirm)}</textarea><label>Dispatched</label><textarea id="t-ship" rows="2">${esc(SET.tpl.ship)}</textarea><label>Feedback</label><textarea id="t-follow" rows="2">${esc(SET.tpl.follow)}</textarea>
+ <div class="act"><button class="p" data-act="saveSettings">Save settings</button></div></div>`;
+
+// ===================== ROUTER =====================
+function route(){const r=location.hash.slice(1)||"dashboard",name=V[r]?r:"dashboard";CUR=name;
+ const n=DB.orders.filter(ready).filter(o=>age(o.date)>=SET.staleDays).length,d=DB.orders.filter(codDue).length,lw=lowStock().length,cnt={dispatch:n,recon:d,inventory:lw};
+ $("#nav").innerHTML=`<h1>${esc(SET.shop)}</h1><div class="sub">ShopDesk · orders, POS & inventory</div>`+NAV.map(([g,items])=>`<h6>${g}</h6>`+items.map(([k,i,l])=>`<a href="#${k}" class="${k===name?"on":""}"><i>${i}</i>${l}${cnt[k]?`<span class="cnt">${cnt[k]}</span>`:""}</a>`).join("")).join("");
+ $("#title").textContent=NAV.flatMap(g=>g[1]).find(x=>x[0]===name)[2];sel.clear();$("#view").innerHTML=V[name]();
+ if(name==="recon")drawRecon()}
+window.addEventListener("hashchange",route);
+const refresh=()=>{const y=scrollY;route();scrollTo(0,y)};
+const onSel=()=>CUR==="recon"?drawRecon():drawBulk();
+
+// ===================== EVENTS =====================
+document.addEventListener("input",e=>{const t=e.target,id=t.id;
+ if(t.dataset.f){F[t.dataset.f]=t.value;drawOrders()}
+ else if(id==="cq")drawCust();else if(id==="wq")drawWa();else if(id==="iq")drawInv();else if(id==="dq")drawDispLog();
+ else if(id==="pq"){P.q=t.value;drawPos()}
+ else if(id==="pdisc"){P.disc=t.value;$("#ptotal").textContent=pkr(cartTotal())}
+ else if(id==="rcd")RC.date=t.value;else if(id==="rcr")RC.ref=t.value;else if(id==="rcv"){RC.received=t.value;drawRecon()}});
+document.addEventListener("change",e=>{const t=e.target,id=t.id;
+ if(t.dataset.f){F[t.dataset.f]=t.value;drawOrders()}
+ else if(id==="cf")drawCust();else if(id==="ws")drawWa();else if(id==="rf"||id==="rt")drawRep();else if(id==="il")drawInv();else if(id==="dfrom"||id==="dto")drawDispLog();
+ else if(id==="ps"){P.store=t.value;P.cart=[];drawPos()}else if(id==="pd"){P.day=t.value;drawDay()}else if(id==="pm")P.method=t.value;
+ else if(id==="rcc"){RC.courier=t.value;refresh()}
+ else if(t.dataset.sel){t.checked?sel.add(t.dataset.sel):sel.delete(t.dataset.sel);onSel()}
+ else if(t.dataset.all!==undefined){document.querySelectorAll("[data-sel]").forEach(c=>{c.checked=t.checked;t.checked?sel.add(c.dataset.sel):sel.delete(c.dataset.sel)});onSel()}
+ else if(t.dataset.reason){byNo(t.dataset.reason).reason=t.value;commit();toast("Reason saved")}
+ else if(t.dataset.pl!==undefined){const p=pById(t.value),ln=t.closest(".three");if(p)ln.querySelector("[name=cost]").value=p.cost}
+ else if(id==="imp")importCsv(t.files[0]);else if(id==="rest")restore(t.files[0])});
+document.addEventListener("keydown",e=>{if(e.target.id==="pq"&&e.key==="Enter"){e.preventDefault();const q=P.q.trim().toLowerCase();if(!q)return;
+ const hit=DB.products.find(p=>p.sku.toLowerCase()===q)||(DB.products.filter(p=>(p.name+p.sku).toLowerCase().includes(q)).length===1&&DB.products.find(p=>(p.name+p.sku).toLowerCase().includes(q)));
+ if(hit){cartAdd(hit.id);P.q="";$("#pq").value="";drawPos()}else toast("No single match")}});
+document.addEventListener("click",e=>{const t=e.target,D=t.dataset;
+ if(D.month){F.month=D.month;refresh();return}if(D.go){location.hash=D.go;return}if(D.fi){FI.p=D.fi;refresh();return}
+ if(D.rccour!==undefined){RC.courier=D.rccour;refresh();$("#rcc")?.scrollIntoView({behavior:"smooth"});return}
+ if(D.tpl){const o=byNo(D.wo);window.open("https://wa.me/"+normPhone(o.phone)+"?text="+encodeURIComponent(fillTpl(D.tpl,o)),"_blank");return}
+ if(D.wa){window.open("https://wa.me/"+normPhone(D.wa),"_blank");return}
+ if(D.block!==undefined){const p=D.block,i=SET.blocked.indexOf(p);i<0?SET.blocked.push(p):SET.blocked.splice(i,1);commit();drawCust();toast(i<0?"Customer blocked":"Unblocked");return}
+ if(D.undoremit){undoRemit(D.undoremit);return}
+ if(D.voidsale){voidSale(D.voidsale);return}
+ if(D.editprod){openProduct(pById(D.editprod));return}
+ if(D.editvendor){openVendor(vById(D.editvendor));return}
+ if(D.stmt){statement(D.stmt);return}
+ if(D.delbill){if(confirm("Delete this bill? Stock already received is NOT reversed.")){DB.bills=DB.bills.filter(b=>b.id!==D.delbill);commit();refresh()}return}
+ if(D.delpay){if(confirm("Delete this payment?")){DB.vpay=DB.vpay.filter(x=>x.id!==D.delpay);commit();refresh()}return}
+ if(D.act){ACT[D.act]?.(t);return}
+ const tr=t.closest("tr.row");if(tr&&!t.closest("input,select,button,a")&&tr.dataset.no)openForm(byNo(tr.dataset.no))});
+$("#add").onclick=()=>openForm();
+$("#sync").onclick=()=>toast("Demo mode — connect your Apps Script / Shopify backend to sync");
+
+// ===================== ACTIONS =====================
+function cartAdd(id){const p=pById(id),i=P.cart.find(x=>x.pid===id);i?i.qty++:P.cart.push({pid:id,qty:1,price:p.price})}
+const ACT={
+ clearSel(){sel.clear();document.querySelectorAll("[data-sel],[data-all]").forEach(c=>c.checked=false);onSel()},
+ bulkApply(){const s=$("#bs").value,c=$("#bc").value;if(!s&&!c)return toast("Pick a status or courier");const n=sel.size;selRows().forEach(o=>{if(s){o.status=s;afterStatus(o)}if(c)o.courier=c});commit();toast("Updated "+n);refresh()},
+ bulkSettle(){let n=0;selRows().forEach(o=>{if(o.cb==="COD"){o.settled=true;n++}});commit();toast(n+" marked settled");refresh()},
+ bulkCsv(){download("selected-orders.csv",ordersToRows(selRows()))},bulkSlip(){slips(selRows())},
+ bulkDel(){if(confirm("Delete "+sel.size+" order(s)? This cannot be undone.")){DB.orders=DB.orders.filter(o=>!sel.has(o.no));commit();refresh()}},
+ dispSave(){let n=0;document.querySelectorAll("[data-dt]").forEach(i=>{const v=i.value.trim();if(!v)return;const o=byNo(i.dataset.dt);o.track=v;o.courier=$(`[data-dc="${CSS.escape(o.no)}"]`).value;o.status="In Progress";afterStatus(o);logDispatch(o);n++});
+  n?(commit(),toast(n+" order(s) dispatched & logged"),refresh()):toast("Enter at least one tracking ID")},
+ dispPrint(){printDoc("Dispatch list — "+today(),`<table><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Product</th><th>Qty</th><th>COD</th></tr>`+vis.map(o=>`<tr><td>${esc(o.no)}</td><td>${esc(o.cust)}</td><td>${esc(o.phone)}</td><td>${esc(o.desc)}</td><td>${o.qty}</td><td>${o.cb==="COD"?num(o.amount):"PAID"}</td></tr>`).join("")+"</table>")},
+ dispSlips(){slips(vis)},
+ dlogCsv(){download("dispatch-record.csv",[["Date","Order","Customer","Phone","Courier","Tracking","COD amount"],...dLogRows().map(d=>[d.date,d.no,d.cust,d.phone,d.courier,d.track,d.cod])])},
+ dlogPrint(){printDoc("Dispatch record",T(["Date","Order","Customer","Courier","Tracking","COD"],dLogRows().map(d=>`<tr><td>${d.date}</td><td>${esc(d.no)}</td><td>${esc(d.cust)}</td><td>${esc(d.courier)}</td><td>${esc(d.track)}</td><td>${d.cod||"prepaid"}</td></tr>`)))},
+ reconSave(){const rows=selRows();if(!rows.length)return toast("Tick the orders covered");if(RC.received==="")return toast("Enter the amount received");
+  const exp=sum(rows)-(SET.feeDeducted?SET.courierFee*rows.length:0),id=uid();rows.forEach(o=>{o.settled=true;o.remitId=id});
+  DB.remits.push({id,date:RC.date||today(),courier:RC.courier,ref:RC.ref,expected:exp,received:Number(RC.received),orders:rows.map(o=>o.no)});
+  RC.received="";RC.ref="";commit();toast("Remittance recorded — "+rows.length+" orders settled");refresh()},
+ cartAdd(t){cartAdd(t.dataset.id);drawCart()},
+ cartInc(t){P.cart.find(i=>i.pid===t.dataset.id).qty++;drawCart()},
+ cartDec(t){const i=P.cart.find(i=>i.pid===t.dataset.id);if(--i.qty<=0)P.cart=P.cart.filter(x=>x!==i);drawCart()},
+ cartDel(t){P.cart=P.cart.filter(i=>i.pid!==t.dataset.id);drawCart()},
+ cartClear(){P.cart=[];P.disc=0;drawCart()},
+ posComplete(){if(!P.cart.length)return toast("Cart is empty");
+  const bad=P.cart.find(i=>stockOf(pById(i.pid),P.store)<i.qty);if(bad&&!confirm(`Only ${stockOf(pById(bad.pid),P.store)} of "${pById(bad.pid).name}" in ${storeName(P.store)}. Sell anyway (stock goes negative)?`))return;
+  const n=Math.max(1000,...DB.posSales.map(s=>parseInt(s.no.slice(4))||0))+1,now=new Date();
+  const s={id:uid(),no:"POS-"+n,date:today(),time:pad(now.getHours())+":"+pad(now.getMinutes()),store:P.store,items:P.cart.map(i=>{const p=pById(i.pid);return{pid:p.id,name:p.name,qty:i.qty,price:i.price,cost:p.cost}}),
+   discount:+P.disc||0,total:cartTotal(),method:P.method,void:false};
+  s.items.forEach(i=>move(i.pid,P.store,-i.qty,"pos sale",s.no));DB.posSales.push(s);P.last=s.id;P.cart=[];P.disc=0;commit();toast("Sale "+s.no+" — "+pkr(s.total));drawPos()},
+ posReceipt(){const s=DB.posSales.find(x=>x.id===P.last);if(!s)return;
+  printDoc(SET.shop+" — Receipt",`<p>${esc(storeName(s.store))}<br>${s.no} · ${fmtDate(s.date)} ${s.time}</p>`+T(["Item","Qty","Price","Total"],s.items.map(i=>`<tr><td>${esc(i.name)}</td><td>${i.qty}</td><td class="r">${num(i.price)}</td><td class="r">${num(i.qty*i.price)}</td></tr>`),[2,3])+`<p>${s.discount?"Discount: "+num(s.discount)+"<br>":""}<b>Total: Rs ${num(s.total)}</b> (${s.method})</p><p>Thank you!</p>`)},
+ posCsv(){download("pos-sales.csv",[["No","Date","Time","Store","Items","Discount","Total","Method","Voided"],...DB.posSales.map(s=>[s.no,s.date,s.time,storeName(s.store),s.items.map(i=>i.qty+"x "+i.name).join("; "),s.discount,s.total,s.method,s.void?"Yes":""])])},
+ newProduct(){openProduct()},transfer(){openTransfer()},toggleMoves(){IV.moves=!IV.moves;refresh()},
+ invCsv(){download("inventory.csv",[["SKU","Product","Vendor","Cost","Price",...DB.stores.map(s=>s.name),"Total","Value at cost"],...DB.products.map(p=>[p.sku,p.name,(vById(p.vendor)||{}).name||"",p.cost,p.price,...DB.stores.map(s=>stockOf(p,s.id)),totalStock(p),totalStock(p)*p.cost])])},
+ newVendor(){openVendor()},newBill(t){openBill(t.dataset.id)},newPay(t){openPay(t.dataset.id)},
+ repCsv(){download(`summary-${R.from}-to-${R.to}.csv`,[...document.querySelectorAll("#rtab tr")].map(r=>[...r.children].map(c=>c.textContent)))},
+ repOrders(){download("orders-report.csv",ordersToRows(repRows()))},repPrint(){printDoc("Sales report "+R.from+" to "+R.to,$("#rp").innerHTML)},
+ exportAll(){download("orders.csv",ordersToRows(DB.orders))},
+ backup(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(DB)],{type:"application/json"}));a.download="shopdesk-backup.json";a.click()},
+ reset(){if(confirm("Replace ALL data with fresh demo data?")){localStorage.removeItem(KEY);DB=API.load();SET=DB.settings;commit();refresh()}},
+ addLine(){$("#lines").insertAdjacentHTML("beforeend",billLine())},
+ saveSettings(){SET.shop=$("#s-shop").value||DEF.shop;SET.couriers=$("#s-cour").value.split(",").map(s=>s.trim()).filter(Boolean);
+  SET.courierFee=+$("#s-cf").value||0;SET.returnFee=+$("#s-rf").value||0;SET.costPct=+$("#s-cp").value||0;SET.staleDays=+$("#s-sd").value||1;SET.feeDeducted=$("#s-fd").checked;
+  SET.cols=[...document.querySelectorAll("[data-col]:checked")].map(c=>c.dataset.col);["confirm","ship","follow"].forEach(k=>SET.tpl[k]=$("#t-"+k).value);
+  const lines=$("#s-stores").value.split("\n").map(s=>s.trim()).filter(Boolean);if(!lines.length)return toast("Keep at least one location");
+  lines.forEach((n,i)=>DB.stores[i]?DB.stores[i].name=n:DB.stores.push({id:uid(),name:n}));
+  while(DB.stores.length>lines.length){const s=DB.stores[DB.stores.length-1];if(s.id===$("#s-online").value||DB.products.some(p=>stockOf(p,s.id))||DB.posSales.some(x=>x.store===s.id)){toast("Kept “"+s.name+"” — it still has stock or sales");break}DB.stores.pop()}
+  SET.onlineLoc=DB.stores.some(s=>s.id===$("#s-online").value)?$("#s-online").value:DB.stores[0].id;commit();toast("Settings saved");route()}
 };
-render();
+function slips(os){if(!os.length)return toast("Nothing to print");printDoc("Shipping slips",os.map(o=>`<div class="slip"><b>${esc(o.no)}</b> — ${esc(o.courier||"")} ${esc(o.track||"")}<br><b>${esc(o.cust)}</b> · ${esc(o.phone)}<br>${esc(o.desc)} × ${o.qty}<br><b>${o.cb==="COD"?"COLLECT Rs "+num(o.amount):"PREPAID"}</b></div>`).join(""))}
+function undoRemit(id){if(!confirm("Undo this remittance? Its orders return to “awaiting remittance”."))return;
+ DB.orders.forEach(o=>{if(o.remitId===id){o.settled=false;delete o.remitId}});DB.remits=DB.remits.filter(r=>r.id!==id);commit();refresh()}
+function voidSale(id){const s=DB.posSales.find(x=>x.id===id);if(!s||!confirm("Void "+s.no+"? Stock will be returned to "+storeName(s.store)+"."))return;
+ s.void=true;s.items.forEach(i=>move(i.pid,s.store,i.qty,"pos void",s.no));commit();drawPos()}
+function importCsv(f){if(!f)return;f.text().then(txt=>{const rows=[];let r=[],c="",q=false;
+ for(let i=0;i<txt.length;i++){const ch=txt[i];if(q){if(ch==='"'){if(txt[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}else if(ch==='"')q=true;else if(ch===","){r.push(c);c=""}else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&txt[i+1]==="\n")i++;r.push(c);c="";rows.push(r);r=[]}else c+=ch}
+ if(c||r.length){r.push(c);rows.push(r)}let n=0;
+ rows.slice(1).forEach(r=>{if(!r[0]||byNo(r[0]))return;const o={};KEYS.forEach((k,i)=>o[k]=r[i]??"");o.qty=+o.qty||1;o.amount=+o.amount||0;
+  const d=new Date(o.date);o.date=isNaN(d)?today():iso(d);o.settled=(r[14]||"").toLowerCase()==="yes"||o.cb==="ONLINE";o.reason=r[15]||"";DB.orders.push(o);n++});
+ commit();toast(n+" order(s) imported");refresh()})}
+function restore(f){if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!Array.isArray(d.orders))throw 0;DB=norm(d);SET=DB.settings;commit();toast("Restored");refresh()}catch(e){toast("Invalid backup file")}})}
+
+// ===================== DIALOGS =====================
+function openProduct(p){const isNew=!p;p=p||{sku:"SKU"+(100+DB.products.length),name:"",cost:0,price:0,vendor:"",reorder:10,stock:{}};
+ modal(`<h3 style="margin:0">${isNew?"New product":"Edit "+esc(p.name)}</h3><div class="two">${fld("sku","SKU / barcode",p.sku)}${fld("name","Product name",p.name,"text","required")}</div>
+ <div class="two">${fld("cost","Cost price",p.cost,"number")}${fld("price","Selling price",p.price,"number")}</div><div class="two">${sfld("vendor","Vendor",kv(vendKV(),p.vendor,"—"))}${fld("reorder","Reorder level (total units)",p.reorder,"number")}</div>
+ <label>${isNew?"Opening stock":"Stock on hand"} per location (changes are logged as adjustments)</label><div class="two">${DB.stores.map(s=>fld("st_"+s.id,esc(s.name),stockOf(p,s.id),"number")).join("")}</div>`,fd=>{
+  const d=Object.fromEntries(fd);if(DB.products.some(x=>x!==p&&x.sku===d.sku)){toast("SKU already exists");return false}
+  const t=isNew?{id:"p"+uid(),stock:{}}:p;Object.assign(t,{sku:d.sku,name:d.name,cost:+d.cost,price:+d.price,vendor:d.vendor,reorder:+d.reorder});
+  if(isNew)DB.products.push(t);
+  DB.stores.forEach(s=>{const diff=Math.round(+d["st_"+s.id]||0)-stockOf(t,s.id);if(diff)move(t.id,s.id,diff,isNew?"opening stock":"adjustment")});
+  commit();toast("Product saved");refresh()},
+  {extra:isNew?"":'<button type="button" id="delp" class="d">Delete</button>'});
+ if(!isNew)$("#delp").onclick=()=>{if(confirm("Delete "+p.name+"?")){DB.products=DB.products.filter(x=>x!==p);$("#dlg").close();commit();refresh()}}}
+function openTransfer(){if(DB.stores.length<2)return toast("Add a second location in Settings");
+ modal(`<h3 style="margin:0">Transfer stock between locations</h3>${sfld("pid","Product",kv(prodKV()))}<div class="two">${sfld("from","From",kv(storeKV(),DB.stores[0].id))}${sfld("to","To",kv(storeKV(),DB.stores[1].id))}</div>${fld("qty","Quantity",1,"number",'min="1"')}`,fd=>{
+  const d=Object.fromEntries(fd),p=pById(d.pid),q=Math.round(+d.qty);if(d.from===d.to){toast("Pick two different locations");return false}
+  if(q<1||stockOf(p,d.from)<q){toast("Only "+stockOf(p,d.from)+" available in "+storeName(d.from));return false}
+  move(p.id,d.from,-q,"transfer out","→ "+storeName(d.to));move(p.id,d.to,q,"transfer in","← "+storeName(d.from));commit();toast("Transferred "+q+" × "+p.name);refresh()},{label:"Transfer"})}
+function openVendor(v){const isNew=!v;v=v||{name:"",phone:"",terms:30};
+ modal(`<h3 style="margin:0">${isNew?"New vendor":"Edit vendor"}</h3>${fld("name","Vendor name",v.name,"text","required")}<div class="two">${fld("phone","Phone",v.phone)}${fld("terms","Payment terms (days)",v.terms,"number")}</div>`,fd=>{
+  const d=Object.fromEntries(fd);isNew?DB.vendors.push({id:"v"+uid(),name:d.name,phone:d.phone,terms:+d.terms||0}):Object.assign(v,{name:d.name,phone:d.phone,terms:+d.terms||0});commit();refresh()})}
+const billLine=()=>`<div class="three"><select name="pid" data-pl>${kv(prodKV(),"","Product…")}</select><input name="qty" type="number" min="0" placeholder="Qty"><input name="cost" type="number" min="0" placeholder="Unit cost"></div>`;
+function openBill(vid){if(!DB.vendors.length)return toast("Add a vendor first");
+ modal(`<h3 style="margin:0">Purchase bill (goods received)</h3><div class="two">${sfld("vendor","Vendor",kv(vendKV(),vid))}${fld("date","Bill date",today(),"date")}</div><div class="two">${fld("ref","Bill / invoice no.")}${sfld("loc","Receive stock into",kv(storeKV(),SET.onlineLoc,"— don't add stock —"))}</div>
+ <label>Items</label><div id="lines">${billLine().repeat(3)}</div><button type="button" class="s" data-act="addLine">+ line</button><div class="two">${fld("paid","Paid now (optional)",0,"number")}${sfld("method","Payment method",opts(PAYM))}</div>`,fd=>{
+  const pids=fd.getAll("pid"),qs=fd.getAll("qty"),cs=fd.getAll("cost"),items=[];pids.forEach((id,i)=>{if(id&&+qs[i]>0)items.push({pid:id,qty:Math.round(+qs[i]),cost:+cs[i]||pById(id).cost})});
+  if(!items.length){toast("Add at least one item");return false}
+  const b={id:"b"+uid(),date:fd.get("date"),vendor:fd.get("vendor"),ref:fd.get("ref"),items,total:items.reduce((s,x)=>s+x.qty*x.cost,0),loc:fd.get("loc")};DB.bills.push(b);
+  if(b.loc)items.forEach(i=>{move(i.pid,b.loc,i.qty,"purchase",b.ref||"bill");pById(i.pid).cost=i.cost});
+  if(+fd.get("paid")>0)DB.vpay.push({id:"vp"+uid(),date:b.date,vendor:b.vendor,amount:+fd.get("paid"),method:fd.get("method"),ref:b.ref,note:"Paid with bill"});commit();toast("Bill "+pkr(b.total)+" saved");refresh()},{label:"Save bill"})}
+function openPay(vid){if(!DB.vendors.length)return toast("Add a vendor first");const bal=vid?Math.max(0,vendorBal(vid)):0;
+ modal(`<h3 style="margin:0">Payment to vendor</h3>${sfld("vendor","Vendor",kv(vendKV(),vid))}<div class="two">${fld("date","Date",today(),"date")}${fld("amount","Amount (PKR)",bal||"","number",'min="1" required')}</div>
+ <div class="two">${sfld("method","Method",opts(PAYM))}${fld("ref","Reference / cheque no.")}</div>${fld("note","Note")}`,fd=>{
+  const d=Object.fromEntries(fd);DB.vpay.push({id:"vp"+uid(),date:d.date,vendor:d.vendor,amount:+d.amount,method:d.method,ref:d.ref,note:d.note});commit();toast("Payment recorded");refresh()},{label:"Record payment"})}
+function statement(vid){const v=vById(vid),ev=[...DB.bills.filter(b=>b.vendor===vid).map(b=>({d:b.date,t:"Bill "+b.ref,dr:b.total,cr:0})),...DB.vpay.filter(x=>x.vendor===vid).map(x=>({d:x.date,t:"Payment ("+x.method+") "+x.ref,dr:0,cr:+x.amount}))].sort((a,b)=>a.d.localeCompare(b.d));
+ let bal=0;printDoc("Statement — "+v.name,T(["Date","Description","Bills","Payments","Balance"],ev.map(e=>{bal+=e.dr-e.cr;return`<tr><td>${fmtDate(e.d)}</td><td>${esc(e.t)}</td><td class="r">${e.dr?num(e.dr):""}</td><td class="r">${e.cr?num(e.cr):""}</td><td class="r">${num(bal)}</td></tr>`}))+`<p><b>Balance due: Rs ${num(bal)}</b></p>`)}
+
+function openForm(o){const isNew=!o,oldTrack=o?o.track:"";
+ o=o||{no:"#"+(Math.max(1300,...DB.orders.map(x=>parseInt(x.no.slice(1))||0))+1),date:today(),desc:"",qty:1,cb:"COD",amount:0,status:"Pending",cust:"",phone:"",track:"",courier:"",daak:"",denim:"",comments:"",settled:false,reason:""};
+ const inp=(k,l,t="text")=>fld(k,l,o[k],t);
+ modal(`<h3 style="margin:0">${isNew?"New order":"Order "+esc(o.no)}</h3><div class="two">${inp("no","Order No")}${inp("date","Date","date")}</div>${inp("desc","Description (product name + variant)")}
+ <div class="two">${inp("qty","Qty","number")}${inp("amount","Amount (PKR)","number")}</div><div class="two">${sfld("cb","C/B",opts(["COD","ONLINE"],o.cb))}${sfld("status","Status",opts(STATUSES,o.status))}</div>
+ <div class="two">${inp("cust","Customer")}${inp("phone","Contact")}</div><div class="two">${inp("track","Tracking ID")}${sfld("courier","Courier",kv(SET.couriers.map(c=>[c,c]),o.courier,"—"))}</div>
+ <div class="two">${inp("daak","Courier status")}${inp("denim","Custom field")}</div>
+ <div class="two">${sfld("reason","Return reason",kv(REASONS.map(c=>[c,c]),o.reason,"—"))}<div><label>COD settled by courier</label><select name="settled"><option value="0">No</option><option value="1" ${o.settled?"selected":""}>Yes</option></select></div></div>
+ <label>Comments</label><textarea name="comments" rows="2">${esc(o.comments)}</textarea>`,(fd,ev)=>{
+  const d=Object.fromEntries(fd);d.qty=+d.qty;d.amount=+d.amount;d.settled=d.settled==="1"||d.cb==="ONLINE";
+  if(d.phone.startsWith("+92"))d.phone="0"+d.phone.slice(3);d.phone=d.phone.replace(/\s+/g,"");
+  if(isNew){if(DB.orders.some(x=>x.no===d.no)){toast("Order no. already exists");return false}
+   if(SET.blocked.includes(d.phone)&&!confirm("This customer is BLOCKED. Save the order anyway?"))return false;DB.orders.push(o)}
+  Object.assign(o,d);afterStatus(o);if(o.track&&o.track!==oldTrack)logDispatch(o);commit();toast("Saved");refresh()},
+  {extra:isNew?"":'<button type="button" id="del" class="d">Delete</button><button type="button" id="wa">WhatsApp</button>'});
+ if(!isNew){$("#del").onclick=()=>{if(confirm("Delete "+o.no+"?")){DB.orders=DB.orders.filter(x=>x!==o);$("#dlg").close();commit();refresh()}};
+  $("#wa").onclick=()=>window.open("https://wa.me/"+normPhone(o.phone)+"?text="+encodeURIComponent(fillTpl(o.status==="In Progress"?"ship":o.status==="Delivered"?"follow":"confirm",o)),"_blank")}}
+route();
 </script>
 </body>
 </html>
